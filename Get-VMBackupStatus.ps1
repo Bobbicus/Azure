@@ -1,0 +1,2 @@
+﻿$container = Get-AzureRmRecoveryServicesBackupContainer -ContainerType AzureVM -Status Registered -FriendlyName $v
+Get-AzureRmRecoveryServicesBackupItem -Container $container -WorkloadType AzureVM | Select-Object Name, ProtectionStatus, ProtectionPolicyName, LatestRecoveryPoint 
