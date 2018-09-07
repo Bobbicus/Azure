@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appGatewayName": {
+      "value": "EU2-APG-JBOSS-PRD"
+    },
+    "skuName": {
+      "value": "Standard_Small"
+    },
+    "capacity": {
+      "value": 1
+    },
+    "vnetRG": {
+      "value": "RG-EASTUS2-GEHATOAL-NETWORK"
+    },
+    "vnetName": {
+      "value": "EASTUS2_VNET01"
+    },    "subnetName": {
+      "value": "AppGatewaySubnet"
+    },
+    "backendIpAddress1": {
+      "value": "10.100.0.1"
+    },
+    "backendIpAddress2": {
+      "value": "10.100.0.2"
+    },
+    "backendPort": {
+      "value": 80
+    },
+    "certData": {
+      "value": "cert in base 64"
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "buildDate": {
+      "value": "07/31/2016"
+    },
+    "buildBy": {
+      "value": "First Last"
+    },
+    "certPassword": {
+      "value": "example"
+    }
+  }
+}

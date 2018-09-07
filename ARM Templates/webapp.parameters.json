@@ -1,0 +1,68 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "AppServicePlanName": {
+      "value": "prd-service-plan"
+    },
+    "webAppNames": {
+      "value": [
+        "unique-name-web1",
+        "unique-name-web2",
+        "unique-name-web3"
+      ]
+    },
+    "skuName": {
+      "value": "S1"
+    },
+    "skuCapacity": {
+      "value": 2
+    },
+    "netFrameworkVersion": {
+      "value": "v4.7"
+    },
+    "phpVersion": {
+      "value": "Off"
+    },
+    "pythonVersion": {
+      "value": "Off"
+    },
+    "32Bit": {
+      "value": "false"
+    },
+    "webSockets": {
+      "value": "false"
+    },
+    "alwaysOn": {
+      "value": "false"
+    },
+    "webServerLogging": {
+      "value": "true"
+    },
+    "detailedErrors": {
+      "value": "true"
+    },
+    "failedRequestTrace": {
+      "value": "true"
+    },
+    "clientAffinityEnabled": {
+      "value": "false"
+    },
+    "logSize": {
+      "value": 25
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "buildDate": {
+      "value": "19700101"
+    },
+    "buildBy": {
+      "value": "racker"
+    }
+    //
+    // Application Insights can be added by
+    // uncommenting lines 230-243 in the template.
+    //
+  }
+}

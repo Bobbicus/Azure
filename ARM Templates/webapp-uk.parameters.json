@@ -1,0 +1,67 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "AppServicePlanName": {
+      "value": "UKS-ASP-MIS-SFV1-PRD"
+    },
+    "webAppName": {
+      "value": "UKS-APP-WEB-MIS-SFV1-PRD"
+    },
+    "sku": {
+      "value": "S2"
+    },
+    "skuCapacity": {
+      "value": 2
+    },
+    "location": {
+      "value": "UK South"
+    },
+    "netFrameworkVersion": {
+      "value": "v4.7"
+    },
+    "phpVersion": {
+      "value": "Off"
+    },
+    "pythonVersion": {
+      "value": "Off"
+    },
+    "32Bit": {
+      "value": "false"
+    },
+    "webSockets": {
+      "value": "false"
+    },
+    "alwaysOn": {
+      "value": "false"
+    },
+    "webServerLogging": {
+      "value": "true"
+    },
+    "detailedErrors": {
+      "value": "true"
+    },
+    "failedRequestTrace": {
+      "value": "true"
+    },
+    "clientAffinityEnabled": {
+      "value": "false"
+    },
+    "logSize": {
+      "value": 25
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "buildDate": {
+      "value": "29/08/18"
+    },
+    "buildBy": {
+      "value": "Bob Larkin"
+    }
+    //
+    // Application Insights can be added by
+    // uncommenting lines 230-243 in the template.
+    //
+  }
+}

@@ -1,0 +1,251 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "AppServicePlanName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "F1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "Describes plan's instance count"
+      }
+    },
+    "webAppNames": {
+      "type": "array",
+      "metadata": {
+        "description": "Names of the web apps"
+      }
+    },
+    "netFrameworkVersion": {
+      "type": "string",
+      "defaultValue": "v4.6",
+      "allowedValues": [
+        "v3.5",
+        "v4.7"
+      ]
+    },
+    "phpVersion": {
+      "type": "string",
+      "defaultValue": "Off",
+      "allowedValues": [
+        "Off",
+        "5.5",
+        "5.6",
+        "7.0",
+        "7.1"
+      ]
+    },
+    "pythonVersion": {
+      "type": "string",
+      "defaultValue": "Off",
+      "allowedValues": [
+        "Off",
+        "2.7",
+        "3.4"
+      ]
+    },
+    "32Bit": {
+      "type": "string",
+      "defaultValue": "false",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "webSockets": {
+      "type": "string",
+      "defaultValue": "false",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "alwaysOn": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "webServerLogging": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "detailedErrors": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "failedRequestTrace": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "clientAffinityEnabled": {
+      "type": "string",
+      "defaultValue": "false"
+    },
+    "logSize": {
+      "type": "int",
+      "defaultValue": 25,
+      "minValue": 25,
+      "maxValue": 100
+    },
+    "environment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "Test",
+        "Development",
+        "Disaster Recovery",
+        "Q/A",
+        "Other"
+      ],
+      "metadata": {
+        "description": "The Environment type we are building",
+        "group": "Tags",
+        "order": 1,
+        "question": "Please enter environment type : "
+      },
+      "defaultValue": "Production"
+    },
+    "buildDate": {
+      "type": "string",
+      "metadata": {
+        "description": "The date of this build",
+        "group": "Tags",
+        "order": 2,
+        "question": "Please enter todays date (mm/dd/yyyy) : "
+      },
+      "defaultValue": "mm/dd/yyyy"
+    },
+    "buildBy": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the person who build this environment",
+        "group": "Tags",
+        "order": 3,
+        "question": "Please enter your full name : "
+      },
+      "defaultValue": "First Last"
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "name": "[parameters('AppServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "capacity": "[parameters('skuCapacity')]"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "AppServicePlan",
+        "Environment": "[parameters('environment')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      },
+      "properties": {
+        "name": "[parameters('AppServicePlanName')]"
+      }
+    },
+    {
+      "name": "[concat(parameters('webAppNames')[copyIndex()])]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName')))]": "Resource",
+        "displayName": "[concat(parameters('webAppNames')[copyIndex()])]",
+        "Environment": "[parameters('environment')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      },
+      "properties": {
+        "name": "[concat(parameters('webAppNames')[copyIndex()])]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
+        "siteConfig": {
+          "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
+          "PhpVersion": "[parameters('phpVersion')]",
+          "pythonVersion": "[parameters('pythonVersion')]",
+          "use32BitWorkerProcess": "[parameters('32Bit')]",
+          "webSocketsEnabled": "[parameters('webSockets')]",
+          "alwaysOn": "[parameters('alwaysOn')]",
+          "requestTracingEnabled": "[parameters('failedRequestTrace')]",
+          "httpLoggingEnabled": "[parameters('webServerLogging')]",
+          "logsDirectorySizeLimit": "[parameters('logSize')]",
+          "detailedErrorLoggingEnabled": "[parameters('detailedErrors')]"
+        },
+        "clientAffinityEnabled": "[parameters('clientAffinityEnabled')]"
+      },
+      //
+      // Uncomment this to add Application Insights to each Web App.
+      //
+      //"resources": [
+      //  {
+      //    "apiVersion": "2014-04-01",
+      //    "name": "[concat(parameters('webAppNames')[copyIndex()],'-ai')]",
+      //    "type": "Microsoft.Insights/components",
+      //    "location": "[resourceGroup().location]",
+      //    "dependsOn": [
+      //      "[concat('Microsoft.Web/Sites/', parameters('webAppNames')[copyIndex()])]"
+      //    ],
+      //    "properties": {
+      //      "applicationId": "[concat(parameters('webAppNames')[copyIndex()],'-ai')]"
+      //    }
+      //  }
+      //],
+      "copy": {
+        "name": "addWebApps",
+        "count": "[length(parameters('webAppNames'))]"
+      }
+    }
+  ],
+  "outputs": {}
+}

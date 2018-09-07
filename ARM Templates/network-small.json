@@ -1,0 +1,282 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "VNET01",
+      "metadata": {
+        "description": "The name of the new Virtual Network to create. Do not include the Region location, this template will name the VNET based on the resource group location where is being deployed."
+      }
+    },
+    "vnetCIDR": {
+      "type": "string",
+      "defaultValue": "172.16.192.0/22",
+      "metadata": {
+        "description": "The IP Address Space for this new virtual Network. For medium networks, we recommend that this is at least a /21 so that you can create 9 additional subnets."
+      }
+    },
+    "environmentA": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "Test",
+        "Development",
+        "Q/A",
+        "Disaster Recovery",
+        "Other"
+      ],
+      "metadata": {
+        "description": "The Environment type we are building"
+      },
+      "defaultValue": "Production"
+    },
+    "subnetAGWCIDRA": {
+      "type": "string",
+      "defaultValue": "172.16.195.64/28",
+      "metadata": {
+        "description": "The IP Address Space of the Application Gateway Subnet. (Reserved Exclusively for Application Gateways)"
+      }
+    },
+    "buildDate": {
+      "type": "string",
+      "metadata": {
+        "description": "The date of this build"
+      },
+      "defaultValue": "01/01/2999"
+    },
+    "buildBy": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the person who build this environment"
+      },
+      "defaultValue": "First Last"
+    }
+  },
+  "variables": {
+    "resourceGroupLocation": "[resourceGroup().location]",
+    "environmentLabel": {
+      "Production": "PRD",
+      "Staging": "STG",
+      "Test": "TST",
+      "Development": "DEV",
+      "Q/A": "QA",
+      "Disaster Recovery": "DR",
+      "Other": "OTR"
+    },
+    "resourceGroupLocationName": {
+      "koreasouth": "KRS",
+      "koreacentral": "KRC",
+      "eastasia": "EAS",
+      "southeastasia": "SEA",
+      "centralus": "CUS",
+      "eastus": "EUS",
+      "eastus2": "EU2",
+      "westus": "WUS",
+      "westus2": "WU2",
+      "westcentralus": "WCU",
+      "northcentralus": "NCU",
+      "southcentralus": "SCU",
+      "northeurope": "NEU",
+      "westeurope": "WEU",
+      "japanwest": "JPW",
+      "japaneast": "JPE",
+      "brazilsouth": "BZS",
+      "australiaeast": "AEA",
+      "australiasoutheast": "ASE",
+      "southindia": "SID",
+      "centralindia": "CID",
+      "westindia": "WID",
+      "canadacentral": "CAC",
+      "canadaeast": "CAE",
+      "ukwest": "UKW",
+      "uksouth": "UKS",
+      "chinaeast": "CEA",
+      "chinanorth": "CNO",
+      "germanycentral": "GEC",
+      "germanynortheast": "GNE"
+    },
+    "virtualNetworkName": "[concat(variables('resourceGroupLocationName')[variables('resourceGroupLocation')],'-', parameters('vnetName'))]",
+    "SubnetAGWNameA": "[concat(variables('virtualNetworkName'), '-AGW-',variables('environmentLabel')[parameters('environmentA')])]",
+    "networkSecurityGroupAGWNameA": "[concat(variables('subnetAGWNameA'), '-NSG')]",
+    "rackspaceBastionDFW": "172.99.99.10/32",
+    "rackspaceBastionIAD": "146.20.2.10/32",
+    "rackspaceBastionORD": "161.47.0.10/32",
+    "rackspaceBastionHKG": "119.9.122.10/32",
+    "rackspaceBastionLON": "134.213.179.10/32",
+    "rackspaceBastionLON5": "134.213.178.10/32",
+    "rackspaceBastionSYD": "119.9.148.10/32",
+    "rackspacepBastionDFW": "72.3.186.100/32",
+    "rackspacepBastionIAD": "146.20.30.100/32",
+    "rackspacepBastionORD": "161.47.6.100/32",
+    "rackspacepBastionHKG": "120.136.39.100/32",
+    "rackspacepBastionLON": "134.213.183.100/32",
+    "rackspacepBastionLON5": "134.213.182.100/32",
+    "rackspacepBastionSYD": "119.9.163.100/32"
+  },
+  "resources": [{
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('networkSecurityGroupAGWNameA')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG-AGW",
+        "Environment": "[parameters('environmentA')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      },
+      "properties": {
+        "securityRules": [{
+            "name": "Allow_LOCAL_SUBNET_INBOUND",
+            "properties": {
+              "description": "Allows intra-subnet communication",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('subnetAGWCIDRA')]",
+              "destinationAddressPrefix": "[parameters('subnetAGWCIDRA')]",
+              "access": "Allow",
+              "priority": 125,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_AZURE_LB_INBOUND",
+            "properties": {
+              "description": "Allows inbound traffic from Azure Load Balancer",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "[parameters('subnetAGWCIDRA')]",
+              "access": "Allow",
+              "priority": 126,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_ApplicationGateway_Health_Ports_INBOUND",
+            "properties": {
+              "description": "Allows Application gateway health ports as per https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-diagnostics",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "65503-65534",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "[parameters('subnetAGWCIDRA')]",
+              "access": "Allow",
+              "priority": 127,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_HTTP_INBOUND",
+            "properties": {
+              "description": "Allows Web access HTTP(80)",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "[parameters('subnetAGWCIDRA')]",
+              "access": "Allow",
+              "priority": 301,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_HTTPS_INBOUND",
+            "properties": {
+              "description": "Allows Web access HTTPS(443)",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "[parameters('subnetAGWCIDRA')]",
+              "access": "Allow",
+              "priority": 302,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_UDP",
+            "properties": {
+              "description": "Deny all inbound UDP",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Deny_ALL_INBOUND_TCP",
+            "properties": {
+              "description": "Deny all inbound TCP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 4001,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('virtualNetworkName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "VirtualNetwork",
+        "Environment": "[parameters('environmentA')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      },
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupAGWNameA'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetCIDR')]"
+          ]
+        },
+        "subnets": [{
+            "name": "[variables('SubnetAGWNameA')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetAGWCIDRA')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupAGWNameA'))]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "vnetRG": {
+      "type": "string",
+      "value": "[resourceGroup().name]"
+    },
+    "vnetName": {
+      "type": "string",
+      "value": "[Variables('virtualNetworkName')]"
+    },
+    "subnetAGWNameA": {
+      "type": "string",
+      "value": "[variables('subnetAGWNameA')]"
+    },
+    "subnetAGWCIDRA": {
+      "type": "string",
+      "value": "[parameters('subnetAGWCIDRA')]"
+    }
+  }
+}

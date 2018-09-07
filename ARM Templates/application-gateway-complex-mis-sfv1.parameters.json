@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appGatewayName": {
+      "value": "PRD-APG01-RGL-APPWEBTST"
+    },
+    "skuName": {
+      "value": "Standard_Medium"
+    },
+    "capacity": {
+      "value": 2
+    },
+    "vnetRG": {
+      "value": "RG1Name"
+    },
+    "vnetName": {
+      "value": "RGVnetName"
+    },
+    "subnetName": {
+      "value": "SubnetName"
+    },
+    "Pool1FQDN": {
+      "metadata": {
+        "description": "FQDN for Backend WebApp"
+      },
+      "value": "1234.azurewebsites.net"
+    },
+    //"Hostname1": {
+      //"value": "hostname.com",
+      //"metadata": {
+       // "description": "Hostname for Listeners"
+      //}
+    //},
+    "certData1": {
+      "value": "Base 64 version of pfx",
+      "metadata": {
+        "description": "Base-64 encoded form of the .pfx file. [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes('C:\\Documents\\wildcard.smartflow.maximiseit.co.pfx')) > 'C:\\Documents\\frontendcert.txt')"
+      }
+    },
+    "certPassword1": {
+      "value": "SecurePassword",
+      "metadata": {
+        "description": "Password for .pfx certificate"
+      }
+    },
+    "appGatewayBackendCert": {
+      "value": "Base 64 version of cer",
+      "metadata": {
+        "description": "Base-64 encoded form of the .cer file. [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes('C:\\Documents\\wildcard.smartflow.maximiseit.co.cer')) > 'C:\\Documents\\backenpubliccert.txt')"
+
+      }
+    },
+    "appGatewayBackendCertPassword": {
+      "value": "SecurePassword",
+      "metadata": {
+        "description": "Password for .cer certificate"
+      }
+    },
+  "environment": {
+    "value": "Production"
+  },
+  "buildDate": {
+    "value": "$(buildDate)"
+  },
+  "buildBy": {
+    "value": "$(buildBy)"
+  }
+}
+}

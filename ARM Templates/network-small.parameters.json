@@ -1,0 +1,24 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "value": "VNET02"
+    },
+    "vnetCIDR": {
+      "value": "172.25.192.0/22"
+    },
+    "environmentA": {
+      "value": "Production"
+    },
+    "subnetAGWCIDRA": {
+      "value": "172.25.195.32/28"
+    },
+    "buildDate": {
+      "value": "01/01/2017"
+    },
+    "buildBy": {
+      "value": "First Last"
+    }
+  }
+}

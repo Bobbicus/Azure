@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "VNET02"
+        },
+        "vnetCIDR": {
+            "value": "172.16.192.0/21"
+        },
+        "environmentA": {
+            "value": "Production"
+        },
+        "subnetDMZCIDRA": {
+            "value": "172.16.192.0/24"
+        },
+        "subnetAPPCIDRA": {
+            "value": "172.16.193.0/24"
+        },
+        "subnetINSCIDRA": {
+            "value": "172.16.194.0/24"
+        },
+        "subnetADCIDRA": {
+            "value": "172.16.195.0/28"
+        },
+        "subnetBASCIDR": {
+            "value": "172.16.195.16/28"
+        },
+        "subnetAGWCIDRA": {
+            "value": "172.16.195.32/28"
+        },
+        "subnetGWCIDR": {
+            "value": "172.16.195.224/27"
+        },
+        "environmentB": {
+            "value": "Staging"
+        },
+        "subnetDMZCIDRB": {
+            "value": "172.16.196.0/24"
+        },
+        "subnetAPPCIDRB": {
+            "value": "172.16.197.0/24"
+        },
+        "subnetINSCIDRB": {
+            "value": "172.16.198.0/24"
+        },
+        "subnetADCIDRB": {
+            "value": "172.16.195.48/28"
+        },
+        "subnetAGWCIDRB": {
+            "value": "172.16.195.64/28"
+        },
+        "buildDate": {
+            "value": "01/01/2017"
+        },
+        "buildBy": {
+            "value": "First Last"
+        }
+    }
+}

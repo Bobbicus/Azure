@@ -1,0 +1,290 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerPrimaryName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the primary SQL Server."
+      }
+    },
+    "sqlServerPrimaryAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The administrator username of the primary SQL Server."
+      }
+    },
+    "sqlServerPrimaryAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The administrator password of the primary SQL Server."
+      }
+    },
+    "sqlServerPrimaryRegion": {
+      "type": "string",
+      "metadata": {
+        "description": "The location of the primary SQL Server."
+      }
+    },
+    "sqlServerSecondaryName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the secondary SQL Server."
+      }
+    },
+    "sqlServerSecondaryRegion": {
+      "type": "string",
+      "metadata": {
+        "description": "The location of the secondary SQL Server."
+      }
+    },
+    "sqlServerSecondaryAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The administrator username of the secondary SQL Server."
+      }
+    },
+    "sqlServerSecondaryAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The administrator password of the secondary SQL Server."
+      }
+    },
+    "sqlFailoverGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the failover group."
+      }
+    },
+    "sqlFirewallStartRange": {
+      "type": "string",
+      "metadata": {
+        "description": "The SQL Server name to use. Must be globally unique. If you need to open to any/any use 0.0.0.0 and 255.255.255.255 for start/end ranges."
+      },
+      "defaultValue": "172.99.99.10"
+    },
+    "sqlFirewallEndRange": {
+      "type": "string",
+      "metadata": {
+        "description": "The SQL Server name to use. Must be globally unique. If you need to open to any/any use 0.0.0.0 and 255.255.255.255 for start/end ranges."
+      },
+      "defaultValue": "172.99.99.10"
+    },
+    "databaseEdition": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "Edition of Azure SQL Server to create"
+      }
+    },
+    "databaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of your initial Database."
+      }
+    },
+    "databaseCollation": {
+      "type": "string",
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "databaseServiceObjectiveName": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "P1",
+        "P2",
+        "P4",
+        "P6",
+        "P11",
+        "P15"
+      ],
+      "metadata": {
+        "description": "Describes the performance level for Edition"
+      }
+    },
+    "transparentDataEncryption": {
+      "type": "string",
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ],
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Enable or disable Transparent Data Encryption (TDE) for the database."
+      }
+    },
+    "environment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "Test",
+        "Development",
+        "Disaster Recovery",
+        "Q/A",
+        "Other"
+      ],
+      "metadata": {
+        "description": "The Environment type we are building",
+        "group": "Tags",
+        "order": 1,
+        "question": "Please enter environment type : "
+      },
+      "defaultValue": "Production"
+    },
+    "buildDate": {
+      "type": "string",
+      "metadata": {
+        "description": "The date of this build",
+        "group": "Tags",
+        "order": 2,
+        "question": "Please enter todays date (mm/dd/yyyy) : "
+      },
+      "defaultValue": "mm/dd/yyyy"
+    },
+    "buildBy": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the person who build this environment",
+        "group": "Tags",
+        "order": 3,
+        "question": "Please enter your full name : "
+      },
+      "defaultValue": "First Last"
+    }
+  },
+    "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers",
+      "kind": "v12.0",
+      "name": "[parameters('sqlServerPrimaryName')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[parameters('sqlServerPrimaryRegion')]",
+      "tags": {
+        "displayName": "SqlServer",
+        "Environment": "[parameters('environment')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      },
+      "properties": {
+        "administratorLogin": "[parameters('sqlServerPrimaryAdminUsername')]",
+        "administratorLoginPassword": "[parameters('sqlServerPrimaryAdminPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "name": "[parameters('databaseName')]",
+          "type": "databases",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[parameters('sqlServerPrimaryRegion')]",
+          "tags": {
+            "displayName": "Database",
+            "Environment": "[parameters('environment')]",
+            "BuildDate": "[parameters('buildDate')]",
+            "BuildBy": "[parameters('buildBy')]"
+          },
+          "properties": {
+            "edition": "[parameters('databaseEdition')]",
+            "collation": "[parameters('databaseCollation')]",
+            "requestedServiceObjectiveName": "[parameters('databaseServiceObjectiveName')]"
+          },
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('sqlServerPrimaryName'))]"
+          ],
+          "resources": [
+            {
+              "comments": "Transparent Data Encryption",
+              "name": "current",
+              "type": "transparentDataEncryption",
+              "apiVersion": "2014-04-01-preview",
+              "properties": {
+                "status": "[parameters('transparentDataEncryption')]"
+              },
+              "dependsOn": [
+                "[parameters('databaseName')]"
+              ]
+            }
+          ]
+        },
+        {
+          "apiVersion": "2015-05-01-preview",
+          "type": "failoverGroups",
+          "name": "[parameters('sqlFailoverGroupName')]",
+          "properties": {
+            "serverName": "[parameters('sqlServerPrimaryName')]",
+            "partnerServers": [
+              {
+                "id": "[resourceId('Microsoft.Sql/servers/', parameters('sqlServerSecondaryName'))]"
+              }
+            ],
+            "readWriteEndpoint": {
+              "failoverPolicy": "Automatic",
+              "failoverWithDataLossGracePeriodMinutes": 60
+            },
+            "readOnlyEndpoint": {
+              "failoverPolicy": "Disabled"
+            },
+            "databases": [
+              "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerPrimaryName'), parameters('databaseName'))]"
+            ]
+          },
+          "dependsOn": [
+            "[parameters('sqlServerPrimaryName')]",
+            "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerPrimaryName'), parameters('databaseName'))]",
+            "[resourceId('Microsoft.Sql/servers', parameters('sqlServerSecondaryName'))]"
+          ]
+        },
+        {
+          "name": "AllowAllMicrosoftAzureIps",
+          "type": "firewallrules",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          },
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('sqlserverPrimaryName'))]"
+          ]
+        },
+        {
+          "type": "firewallrules",
+          "apiVersion": "2015-05-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('sqlserverPrimaryName'))]"
+          ],
+          "location": "[resourceGroup().location]",
+          "name": "CustomerRange",
+          "properties": {
+            "endIpAddress": "[parameters('sqlFirewallEndRange')]",
+            "startIpAddress": "[parameters('sqlFirewallStartRange')]"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers",
+      "kind": "v12.0",
+      "name": "[parameters('sqlServerSecondaryName')]",
+      "apiVersion": "2014-04-01-preview",
+      "location": "[parameters('sqlServerSecondaryRegion')]",
+      "properties": {
+        "administratorLogin": "[parameters('sqlServerSecondaryAdminUsername')]",
+        "administratorLoginPassword": "[parameters('sqlServerSecondaryAdminPassword')]",
+        "version": "12.0"
+      }
+    }
+  ]
+}

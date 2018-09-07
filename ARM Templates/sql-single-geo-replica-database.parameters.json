@@ -1,0 +1,63 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerPrimaryName": {
+      "value": "bobsql280833"
+    },
+    "sqlServerPrimaryAdminUsername": {
+      "value": "bobadmin"
+    },
+    "sqlServerPrimaryAdminPassword": {
+      "value": "TTNXYmC5A7dwh$"
+    },
+    "sqlServerPrimaryRegion": {
+      "value": "eastus"
+    },
+    "sqlServerSecondaryName": {
+      "value": "bobsql2808dr33"
+    },
+    "sqlServerSecondaryRegion": {
+      "value": "westeurope"
+    },
+    "sqlServerSecondaryAdminUsername": {
+      "value": "bobadmin"
+    },
+    "sqlServerSecondaryAdminPassword": {
+      "value": "TTNXYmC5A7dwh$"
+    },
+    "sqlFailoverGroupName": {
+      "value": "bobfailplan"
+    },
+    "sqlFirewallStartRange": {
+      "value": "172.99.99.10"
+    },
+    "sqlFirewallEndRange": {
+      "value": "172.99.99.10"
+    },
+    "databaseEdition": {
+      "value": "Basic"
+    },
+    "databaseName": {
+      "value": "bobdb01"
+    },
+    "databaseCollation": {
+      "value": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "databaseServiceObjectiveName": {
+      "value": "Basic"
+    },
+    "transparentDataEncryption": {
+      "value": "Enabled"
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "buildDate": {
+      "value": "28/08/18"
+    },
+    "buildBy": {
+      "value": "Bob Larkin"
+    }
+  }
+}
