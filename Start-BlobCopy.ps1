@@ -46,10 +46,12 @@ $SourceConatiner = $srccontainers | Out-GridView -OutputMode Single
 
 $SourceStorageContainerName = $SourceConatiner.Name
             
-write-host $SourceStorageContainerName     -ForegroundColor Cyan
+write-host $SourceStorageContainerName -ForegroundColor Cyan
 
+<#
 $destcontainers = Get-AzureStorageContainer -Context $destcontext
 #check if conatiner exists in destination folder and create a new container matching the source container if needed.
+
 if (!$destcontainers)
 {
     write-host "no containers exist"
@@ -64,10 +66,11 @@ elseif ($destcontainers.name -notcontains $SourceStorageContainerName)
     write-host "no matching containers exist, creating new container named $SourceStorageContainerName"
     New-AzureStorageContainer -Name $SourceStorageContainerName -Context $destcontext
 }
+#>
 
-#$destcontainers = Get-AzureStorageContainer -Context $destcontext
-#write-host "`nSelect destination container" -ForegroundColor Cyan         
-$DestinationConatiner = $destcontainers | Where-Object {$_.name -eq "$SourceStorageContainerName"}
+$destcontainers = Get-AzureStorageContainer -Context $destcontext
+write-host "`nSelect destination container" -ForegroundColor Cyan         
+$DestinationContainer = $destcontainers | Out-GridView -OutputMode Single
 
 #list blobs from source folder.
 $SrcBlobs = Get-AzureStorageBlob -Context $srccontext -Container $SourceStorageContainerName
@@ -77,7 +80,7 @@ $SourceBlob = $SrcBlobs| Out-GridView -OutputMode Single
 
 
 #list blobs from destination folder.
-$destBlobs = Get-AzureStorageBlob -Context $destcontext -Container $SourceStorageContainerName
+$destBlobs = Get-AzureStorageBlob -Context $destcontext -Container $DestinationContainer.name
 
 #Check if blob exists in destiantion folder before proceeding
 $srcblobname = $SourceBlob.Name
@@ -85,7 +88,7 @@ $srcblobname = $SourceBlob.Name
 if (!$destBlobs)
 {
    write-host "no blobs exists proceeding with copy"
-   Start-AzureStorageBlobCopy -SrcContext $srcContext -SrcContainer $SourceStorageContainerName -SrcBlob $SourceBlob.Name -DestContext $destcontext -DestContainer $DestinationConatiner.name  -DestBlob $SourceBlob.Name 
+   Start-AzureStorageBlobCopy -SrcContext $srcContext -SrcContainer $SourceStorageContainerName -SrcBlob $SourceBlob.Name -DestContext $destcontext -DestContainer $DestinationContainer.name  -DestBlob $SourceBlob.Name 
 }
 elseif ($destBlobs.name -contains $SourceBlob.Name)
 {
@@ -98,7 +101,7 @@ elseif ($destBlobs.name -contains $SourceBlob.Name)
     If ($UserInput -eq "y")
     {
         write-host "Overewriting exising file" -ForegroundColor Yellow
-        Start-AzureStorageBlobCopy -SrcContext $srcContext -SrcContainer $SourceStorageContainerName -SrcBlob $SourceBlob.Name -DestContext $destcontext -DestContainer $DestinationConatiner.name  -DestBlob $SourceBlob.Name -force
+        Start-AzureStorageBlobCopy -SrcContext $srcContext -SrcContainer $SourceStorageContainerName -SrcBlob $SourceBlob.Name -DestContext $destcontext -DestContainer $DestinationContainer.name  -DestBlob $SourceBlob.Name -force
     }
     elseif ($UserInput -eq "n")
     {
