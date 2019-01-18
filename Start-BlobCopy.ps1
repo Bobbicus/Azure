@@ -65,9 +65,9 @@ elseif ($destcontainers.name -notcontains $SourceStorageContainerName)
     New-AzureStorageContainer -Name $SourceStorageContainerName -Context $destcontext
 }
 
-$destcontainers = Get-AzureStorageContainer -Context $destcontext
-write-host "`nSelect destination container" -ForegroundColor Cyan         
-$DestiantionConatiner = $destcontainers | Out-GridView -OutputMode Single
+#$destcontainers = Get-AzureStorageContainer -Context $destcontext
+#write-host "`nSelect destination container" -ForegroundColor Cyan         
+$DestinationConatiner = $destcontainers | Where-Object {$_.name -eq "$SourceStorageContainerName"}
 
 #list blobs from source folder.
 $SrcBlobs = Get-AzureStorageBlob -Context $srccontext -Container $SourceStorageContainerName
@@ -85,7 +85,7 @@ $srcblobname = $SourceBlob.Name
 if (!$destBlobs)
 {
    write-host "no blobs exists proceeding with copy"
-   Start-AzureStorageBlobCopy -SrcContext $srcContext -SrcContainer $SourceStorageContainerName -SrcBlob $SourceBlob.Name -DestContext $destcontext -DestContainer $DestiantionConatiner.name  -DestBlob $SourceBlob.Name 
+   Start-AzureStorageBlobCopy -SrcContext $srcContext -SrcContainer $SourceStorageContainerName -SrcBlob $SourceBlob.Name -DestContext $destcontext -DestContainer $DestinationConatiner.name  -DestBlob $SourceBlob.Name 
 }
 elseif ($destBlobs.name -contains $SourceBlob.Name)
 {
@@ -98,7 +98,7 @@ elseif ($destBlobs.name -contains $SourceBlob.Name)
     If ($UserInput -eq "y")
     {
         write-host "Overewriting exising file" -ForegroundColor Yellow
-        Start-AzureStorageBlobCopy -SrcContext $srcContext -SrcContainer $SourceStorageContainerName -SrcBlob $SourceBlob.Name -DestContext $destcontext -DestContainer $DestiantionConatiner.name  -DestBlob $SourceBlob.Name -force
+        Start-AzureStorageBlobCopy -SrcContext $srcContext -SrcContainer $SourceStorageContainerName -SrcBlob $SourceBlob.Name -DestContext $destcontext -DestContainer $DestinationConatiner.name  -DestBlob $SourceBlob.Name -force
     }
     elseif ($UserInput -eq "n")
     {
