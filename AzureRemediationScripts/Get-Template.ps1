@@ -37,18 +37,14 @@ Function Get-FunctionName
         if($variable -eq $true)
         {
             Write-Output "Hello Team,`n`nWrite message here that will be posted to ticket."
-            Write-Output "`n`nMicrosoft Azure Engineer"
-            Write-Output "Rackspce Toll Free: (800) 961-4454"
-            Write-Output "`n`n`n[TICKET_UPDATE=PUBLIC]"
-            Write-Output "[TICKET_STATUS=CONFIRM SOLVED]"
+            Write-Output "`n`nAzure Engineer"
+
         }
         else
         {
             #Private update and keep ticket open.  Add Information for tech to aid troubleshooting.
             Write-Output "No remediation action taken"
             Write-Output "Additional information to aid troubleshooting"
-            Write-Output "[TICKET_UPDATE=PRIVATE]"
-            Write-Output "[TICKET_STATUS=OPEN]"
         }
     
     }
@@ -58,8 +54,7 @@ Function Get-FunctionName
         $ErrMsg = "Powershell exception :: Line# $($_.InvocationInfo.ScriptLineNumber) :: $($_.Exception.Message)"
         Write-Output "Script failed to run"
         Write-Output $ErrMsg
-        Write-Output "[TICKET_UPDATE=PRIVATE]"
-        Write-Output "[TICKET_STATUS=ALERT RECEIVED"
+
     }
 }
 

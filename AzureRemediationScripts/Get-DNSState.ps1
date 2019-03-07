@@ -55,10 +55,7 @@ Function Get-DNSState
              {
                 Write-Output "DNS State Good after service restart"
                 Write-Output "Hello Team,`n`nWrite message here that will be posted to ticket."
-                Write-Output "`n`nMicrosoft Azure Engineer"
-                Write-Output "Rackspce Toll Free: (800) 961-4454"
-                Write-Output "`n`n`n[TICKET_UPDATE=PUBLIC]"
-                Write-Output "[TICKET_STATUS=CLOSED]"
+                Write-Output "`n`nAzure Engineer"
              }
              #if false, restart the DNS service and then recheck the eventlog
              if ($DNSState -eq $false)
@@ -71,18 +68,13 @@ Function Get-DNSState
                     {
                         Write-Output "DNS State Good after service restart"
                         Write-Output "Hello Team,`n`nWrite message here that will be posted to ticket."
-                        Write-Output "`n`nMicrosoft Azure Engineer"
-                        Write-Output "Rackspce Toll Free: (800) 961-4454"
-                        Write-Output "`n`n`n[TICKET_UPDATE=PUBLIC]"
-                        Write-Output "[TICKET_STATUS=CLOSED]"
+                        Write-Output "`n`nAzure Engineer"
                     }
                     if ($DNSState -eq $false)
                     {
                             #Private update and keep ticket open.  Add Information for tech to aid troubleshooting.
                             Write-Output "No remediation action taken"
                             Write-Output "Additional information to aid troubleshooting"
-                            Write-Output "[TICKET_UPDATE=PRIVATE]"
-                            Write-Output "[TICKET_STATUS=OPEN]"
                     }
               }
                 
@@ -93,8 +85,6 @@ Function Get-DNSState
         $ErrMsg = "Powershell exception :: Line# $($_.InvocationInfo.ScriptLineNumber) :: $($_.Exception.Message)"
         Write-Output "Script failed to run"
         Write-Output $ErrMsg
-        Write-Output "[TICKET_UPDATE=PRIVATE]"
-        Write-Output "[TICKET_STATUS=OPEN]"
     }
    
 

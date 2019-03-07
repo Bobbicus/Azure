@@ -34,7 +34,7 @@
  
 General Information:
 ------------------------------------------------
-Virtual Machine  : OH-DC-1
+Virtual Machine  : DC-1
 Operating System : Microsoft Windows Server 2016 Datacenter
 IPv4 Address     : 172.16.195.4
 Last Reboot Time : 11/16/2017 10:38:19
@@ -101,9 +101,6 @@ https://social.technet.microsoft.com/wiki/contents/articles/10183.azure-backup-e
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Oliver Hurn        :: 16-NOV-2017 :: XX-XXX   :: Bob Larkin  :: Release
-    2.0     :: Oliver Hurn        :: 22-DEC-2017 :: XX-XXX   :: Bob Larkin  :: Updated output logic
-    2.1     :: Oliver Hurn        :: 05-MAR-2018 :: XX-XXX   ::             :: Added Confirm Solved logic and updated Get-VSS function
 #>
 
 Param(
@@ -361,7 +358,7 @@ Function Get-AzureFileBackup
                     $OutputGood = $null
                     $OutputGood += "[TICKET_UPDATE=PUBLIC]`n"
                     $OutputGood += "[TICKET_STATUS=CONFIRM SOLVED]`n"
-                    $OutputGood += "Hello Team,`n`nRackspace automation has verified that the Azure MARS Backup Agent has retried and successfully executed its most recent job, which completed successfully:"
+                    $OutputGood += "Hello Team,`n`n automation has verified that the Azure MARS Backup Agent has retried and successfully executed its most recent job, which completed successfully:"
                     $OutputGood += "`n`n--------------------------------------------------------------------`n"
                     $OutputGood += "VM            : $($ComputerName)`n"
                     $OutputGood += "OS            : $($OSType)`n"
@@ -372,7 +369,7 @@ Function Get-AzureFileBackup
                     $OutputGood += "Event message : $($GoodMsg)"
                     $OutputGood += "`n----------------------------------------------------------------------------`n`n"
                     $OutputGood += "Please feel free to update this ticket if you have any questions.`n`n"
-                    $OutputGood += "Kind regards,`n`nMicrosoft Azure Engineer`nRackspace Toll Free: (800) 961-4454"
+                    $OutputGood += "Kind regards,`n`n"
  
     #Calculate current Alert State
     $AlertState = ($GoodDate) -gt ($ErrorDate)
@@ -390,7 +387,7 @@ Function Get-AzureFileBackup
                     #Output for Ticket Update.
                     Write-Output "[TICKET_UPDATE=PRIVATE]"
                     Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
-                    Write-Output "Hello Racker,`n`nPlease use the following report to identify any misconfigured items:`n"
+                    Write-Output "Hello,`n`nPlease use the following report to identify any misconfigured items:`n"
                     Write-Output "          :::::::  MARS Report  :::::::" 
                     Write-Output " "
                     Write-Output "General Information:"

@@ -1,6 +1,6 @@
 ﻿<#
     .SYNOPSIS
-    Smart Ticket remediation script for Azure Recovery Service Vault.
+    Remediation script for Azure Recovery Service Vault.
        
     .DESCRIPTION
     Ingests JSON payload and based on $FailureDetails variable, performs different remediation actions and generates a CORE Ticket output.
@@ -11,7 +11,7 @@
     Makes changes: Yes
 
     .EXAMPLE
-    Full command:  .\raxbackupvaulterror.ps1
+    Full command:  .\backupvaulterror.ps1
     Description: Smart Ticket script - payload aware.
        
     .OUTPUTS
@@ -61,8 +61,6 @@
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Oliver Hurn        :: 08-JUN-2017 :: XX-XXX   :: Bob Larkin  :: Release
-    1.1     :: Oliver Hurn        :: 28-JUN-2017 :: XX-XXX   :: ---         :: $ResourceGroup bug fixes
 #>
 
     #Script Uri
@@ -73,14 +71,8 @@
 
     #region Testing
     #uncomment for testing
-    #$object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\rsv\vmagent.json)"
-    #$object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\rsv\snapshot.json)"
-    #$object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\rsv\vss.json)"
-    #$object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\rsv\nsg.json)"
-    #$object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\rsv\VMState.json)"
-    #$object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\rsv\largedisk.json)"
-    #$object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\rsv\else.json)"
-    #$object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\rsv\complus.json)"
+    #$object = ConvertFrom-Json "$(get-content -Path C:\docuemtents\test.json)"
+
     #endregion
 
 try
@@ -107,7 +99,7 @@ try
     $LocalIpAddress = ((ipconfig | findstr [0-9].\.)[0]).Split()[-1] 
     #endregion
 
-    $ticketSignature = "Kind regards,`n`nSmart Ticket Automation`nRackspace Toll Free (US): 1800 961 4454`n                    (UK): 0800 032 1667"
+    $ticketSignature = "Kind regards,`n`n"
 
     #region Create Functions Section
     #Install Windows Azure Guest Agent Function
@@ -117,7 +109,7 @@ try
         {
 
             #Set temp installation path
-            $vmAgentInstallationPath = "C:\rs-pkgs\VmAgentInstaller"
+            $vmAgentInstallationPath = "C:\dog-temp\VmAgentInstaller"
 
             #Create Directory
             New-Item -ItemType Directory -Force -Path $vmAgentInstallationPath | Out-Null
@@ -161,7 +153,7 @@ try
     }
 
     #Restart Services Function
-    Function Restart-rsAzureService
+    Function Restart-AzureService
     {
             #Service Name paramater
             param([string]$ServiceName)
@@ -328,10 +320,10 @@ try
         $WinAzureGuestAgentInstall = Install-WinAzureGuestAgent
 
         #perform service restart
-        $rsvService1 = Restart-rsAzureService -ServiceName WindowsAzureGuestAgent
-        $rsvService2 = Restart-rsAzureService -ServiceName IaasVmProvider
-        $rsvService3 = Restart-rsAzureService -ServiceName VSS
-
+        $rsvService1 = Restart-AzureService -ServiceName WindowsAzureGuestAgent
+        $rsvService2 = Restart-AzureService -ServiceName IaasVmProvider
+        $rsvService3 = Restart-AzureService -ServiceName VSS
+    
         #region VMAgentOutput
         $VMAgentOutput = $null
         $VMAgentOutput += "Hello Team,`n`nThis error is thrown if there is a problem with the VM Agent or network access to the Azure infrastructure is blocked in some way. Automated remediation has attempted to update the Windows Azure Guest Agent and restart each Azure-related Backup service, as well as, set its start-up type to 'Automatic':"
@@ -362,7 +354,7 @@ try
         #Agent install failure, do not kick off paas remediation
         else
         {
-            $VMAgentOutput += "Windows Azure Guest Agent update failed, please remediate manually. Logs can be found in directory: C:\rs-pkgs\VmAgentInstaller\`n`n"
+            $VMAgentOutput += "Windows Azure Guest Agent update failed, please remediate manually. Logs can be found in directory: C:\dog-temp\VmAgentInstaller\`n`n"
             $VMAgentOutput += "$($ticketSignature)"
             $VMAgentOutput += "[TICKET_UPDATE=PRIVATE]"
             $VMAgentOutput += "[TICKET_STATUS=ALERT RECEIVED]"
@@ -375,14 +367,14 @@ try
     elseif ($FailureDetails -like "*Snapshot operation failed due to VSS*")
     {
         #Restart VSS Service
-        $VSSService1 = Restart-rsAzureService -ServiceName VSS
+        $VSSService1 = Restart-AzureService -ServiceName VSS
         
         #Query VSS Writers
         $VSS = Get-VSS    
 
         #region VSSOutput
         $VssOutput = $null
-        $VssOutput += "Hello Team,`n`nRackspace Automation has restarted the Windows VSS Service and subsequently queried the VSS Writers present on VM: $($ComputerName), which are potentially causing Azure VM-Level Backup jobs to fail:"
+        $VssOutput += "Hello Team,`n`nAutomation has restarted the Windows VSS Service and subsequently queried the VSS Writers present on VM: $($ComputerName), which are potentially causing Azure VM-Level Backup jobs to fail:"
         $VssOutput += "`n`nGuest OS Information:`n------------------------------------------------------------"
         $VssOutput += "`nVirtual Machine  : $($ComputerName)"
         $VssOutput += "`nOperating System : $($OSType)"
@@ -490,9 +482,9 @@ try
     elseif ($FailureDetails -like "*VM is in Failed Provisioning State*")
     {
         #perform service restart
-        $rsvService1 = Restart-rsAzureService -ServiceName WindowsAzureGuestAgent
-        $rsvService2 = Restart-rsAzureService -ServiceName IaasVmProvider
-        $rsvService3 = Restart-rsAzureService -ServiceName VSS
+        $rsvService1 = Restart-AzureService -ServiceName WindowsAzureGuestAgent
+        $rsvService2 = Restart-AzureService -ServiceName IaasVmProvider
+        $rsvService3 = Restart-AzureService -ServiceName VSS
 
         #region VMStateOutput
         $VMStateOutput = $null
@@ -552,9 +544,9 @@ try
         $WinAzureGuestAgentInstall = Install-WinAzureGuestAgent
 
         #perform service restart
-        $rsvService1 = Restart-rsAzureService -ServiceName WindowsAzureGuestAgent
-        $rsvService2 = Restart-rsAzureService -ServiceName IaasVmProvider
-        $rsvService3 = Restart-rsAzureService -ServiceName VSS
+        $rsvService1 = Restart-AzureService -ServiceName WindowsAzureGuestAgent
+        $rsvService2 = Restart-AzureService -ServiceName IaasVmProvider
+        $rsvService3 = Restart-AzureService -ServiceName VSS
 
         #region VMAgentNotResponsiveOutput
         $VMAgentNotResponsiveOutput = $null
@@ -586,7 +578,7 @@ try
         #Agent install failure, do not kick off paas remediation
         else
         {
-            $VMAgentNotResponsiveOutput += "Windows Azure Guest Agent update failed, please remediate manually. Logs can be found in directory: C:\rs-pkgs\VmAgentInstaller\`n`n"
+            $VMAgentNotResponsiveOutput += "Windows Azure Guest Agent update failed, please remediate manually. Logs can be found in directory: C:\backuplogs\VmAgentInstaller\`n`n"
             $VMAgentNotResponsiveOutput += "$($ticketSignature)"
             $VMAgentNotResponsiveOutput += "[TICKET_UPDATE=PRIVATE]"
             $VMAgentNotResponsiveOutput += "[TICKET_STATUS=ALERT RECEIVED]"
@@ -600,7 +592,7 @@ try
     elseif ($FailureDetails -like "*COM+*")
     {
         #perform service restart
-        $COMService1 = Restart-rsAzureService -ServiceName COMSysApp
+        $COMService1 = Restart-AzureService -ServiceName COMSysApp
         
         #region COM+ Output
         $COMOutput = $null
@@ -628,17 +620,16 @@ try
     else
     {
         #perform service restart
-        $rsvService1 = Restart-rsAzureService -ServiceName WindowsAzureGuestAgent
-        $rsvService2 = Restart-rsAzureService -ServiceName IaasVmProvider
-        $rsvService3 = Restart-rsAzureService -ServiceName VSS
+        $rsvService1 = Restart-AzureService -ServiceName WindowsAzureGuestAgent
+        $rsvService2 = Restart-AzureService -ServiceName IaasVmProvider
+        $rsvService3 = Restart-AzureService -ServiceName VSS
 
         $CatchOutput = $null
         $CatchOutput += "[TICKET_UPDATE=PRIVATE]"
         $CatchOutput += "[TICKET_STATUS=ALERT RECEIVED]"
         $CatchOutput += "[TICKET_PAAS_REMEDIATION=TRUE]"
         $CatchOutput += "[TICKET_PAAS_DEVICE=$($ResourceId)]`n"
-        $CatchOutput += "Unrecognised FailureDetails property. Please review the following Smart Ticket Scripts wiki for what is recognised:`n`n"
-        $CatchOutput += "https://one.rackspace.com/pages/viewpage.action?title=Smart+Tickets+Scripts&spaceKey=FSFA#SmartTicketsScripts-raxbackupvaulterror.ps1"
+        $CatchOutput += "Unrecognised FailureDetails property."
         $CatchOutput += "`n`nGuest OS Information:`n-------------------------------------------------------------------"
         $CatchOutput += "`nVirtual Machine  : $($ComputerName)"
         $CatchOutput += "`nOperating System : $($OSType)"

@@ -23,26 +23,26 @@
 
     Virtual Machine Details:
     ------------------------------------------------------------
-    VM Resource    : jumpy
+    VM Resource    : VM1
     Power State    : VM running
-    Resource Group : NEU-RSG-RAX-PRD
+    Resource Group : RG1
 
     Recent Health Events:
     ------------------------------------------------------------
 
-    subscriptionId : 795b2694-e4ce-4fcf-aae9-8446e664c767
+    subscriptionId : 13236a-ab3242234324-ASD123454-78090E
     location       : northeurope
-    resourceGroup  : NEU-RSG-RAX-PRD
-    resource       : jumpy
+    resourceGroup  : RG1
+    resource       : VM1
     status         : Available
     summary        : There aren't any known Azure platform problems affecting this virtual machine
     reason         : 
     occuredTime    : 2018-04-16T08:45:27Z
 
-    subscriptionId : 795b2694-e4ce-4fcf-aae9-8446e664c767
+    subscriptionId : 13236a-ab3242234324-ASD123454-78090E
     location       : northeurope
-    resourceGroup  : NEU-RSG-RAX-PRD
-    resource       : jumpy
+    resourceGroup  : RG1
+    resource       : vm1
     status         : Unavailable
     summary        : We're sorry, your virtual machine isn't available and it is being redeployed due to an unexpected failure on the host server
     reason         : Unplanned
@@ -52,10 +52,6 @@
 
     Kind regards,
 
-    Smart Ticket Automation
-    Rackspace Toll Free (US): 1800 961 4454
-                        (UK): 0800 032 1667
-
         
     .NOTES
     Minimum OS: 2012 
@@ -64,8 +60,7 @@
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Oliver Hurn        :: 15-JUL-2018 :: XX-XXX   :: Bob Larkin  :: Release
-    1.1     :: Oliver Hurn        :: 31-JUL-2018 :: XX-XXX   :: Bob Larkin  :: Bug fix re: $vmName
+
 
 #>  
     #Script Uri
@@ -85,7 +80,7 @@
     elseif ($testMode -eq 1)
     {
         #Testing payload
-        $object = ConvertFrom-Json "$(get-content -Path C:\Users\oliv8274\Desktop\payload\shutdown1.json)"
+        $object = ConvertFrom-Json "$(get-content -Path C:\temp\shutdown1.json)"
     }
 
     #Set Payload variables
@@ -97,7 +92,7 @@
 
 
     #Ticket Signature
-    $ticketSignature = "Kind regards,`n`nSmart Ticket Automation`nRackspace Toll Free (US): 1800 961 4454`n                    (UK): 0800 032 1667"
+    $ticketSignature = "Kind regards,`n`n"
 
 #Main Function
 Function Get-UnexpectedShutdown
@@ -184,8 +179,6 @@ function Get-AzureResourceHealth
         if ($powerState -eq "VM running" -and $confirmData.reasonType[1] -eq "Unplanned" -and $confirmData.availabilityState[0] -eq "Available")
         {
             $Output1 = $null
-            $Output1 += "[TICKET_UPDATE=PUBLIC]`n"
-            $Output1 += "[TICKET_STATUS=CONFIRM SOLVED]`n"
             $Output1 += "Hello Team,`n`nSmart Ticket Automation has confirmed VM: $($VMName) is available and running, after it had recently been redeployed to a new hypervisor:`n"
             $Output1 += "`n`Virtual Machine Details:`n------------------------------------------------------------`n"
             $Output1 += "VM Resource    : $($vmName)`n"
@@ -202,8 +195,6 @@ function Get-AzureResourceHealth
         else
         {
             $Output2 = $null
-            $Output2 += "[TICKET_UPDATE=PUBLIC]`n"
-            $Output2 += "[TICKET_STATUS=ALERT RECEIVED]`n"
             $Output2 += "Hello Team,`n`nSmart Ticket Automation has confirmed the PowerState of VM: $($VMName) to be - $($powerState):"
             $Output2 += "`n`nVirtual Machine Details:`n------------------------------------------------------------`n"
             $Output2 += "VM Resource    : $($vmName)`n"
@@ -212,7 +203,7 @@ function Get-AzureResourceHealth
             $Output2 += "Recent Health Events:`n"
             $Output2 += "------------------------------------------------------------"
             $Output2 += "$healthOutput"
-            $Output2 += "A Racker will review this ticket shortly and they will continue troubleshooting.`n`n"
+            $Output2 += "An engineer will review this ticket shortly and they will continue troubleshooting.`n`n"
             $Output2 += "$($ticketSignature)"  
             $Output2      
         }

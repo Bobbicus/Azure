@@ -1,58 +1,37 @@
-﻿ <#"[
-  {
-    "TimeGenerated": "2017-12-09T13:35:11.97Z",
-    "Computer": "OH-DC-1",
-    "Source": "Microsoft-Windows-ActiveDirectory_DomainService",
-    "EventLog": "Directory Service",
-    "EventLevelName": "Error",
-    "EventID": 2916,
-    "ParameterXml": "<Param>905b3 (msDS-Behavior-Version)</Param><Param>7</Param><Param>CN=NTDS Settings,CN=LV-AD1-NL,CN=Servers,CN=London,CN=Sites,CN=Configuration,DC=euromonitor,DC=local</Param><Param>EUROAD1.euromonitor.local</Param>",
-    "Message": "LCID;1033\tLocale;ENU\tMessage;The local read only domain controller (RODC) attempted to update its functional level by writing the following value the following attribute of the following object on the following writable domain controller (DC).  This attempt failed.  This attempt will be retried.  However, this update will only succeed if the functional level of the writable DC is at least Windows Server 2008 R2.  This error will re-occur until the update attempt is made against such a writable DC. %n This situation may correct itself automatically.  If this error is encountered again, manual intervention may be necessary.%n %n User Action%n To resolve this situation manually, the correct functional level of this RODC should be written to the specified attribute of the specified object on a writable DC in this domain.  The functional level of that writable DC must be at least Windows Server 2008 R2.%n %n %nAttribute name: %n%1 %nCorrect functional level of this RODC: %n%2 %nObject DN: %n%3 %nWritable DC name used in this attempt: %n%4 \t",
-    "RenderedDescription": "The local read only domain controller (RODC) attempted to update its functional level by writing the following value the following attribute of the following object on the following writable domain controller (DC).  This attempt failed.  This attempt will be retried.  However, this update will only succeed if the functional level of the writable DC is at least Windows Server 2008 R2.  This error will re-occur until the update attempt is made against such a writable DC.   This situation may correct itself automatically.  If this error is encountered again, manual intervention may be necessary.    User Action  To resolve this situation manually, the correct functional level of this RODC should be written to the specified attribute of the specified object on a writable DC in this domain.  The functional level of that writable DC must be at least Windows Server 2008 R2.     Attribute name:  905b3 (msDS-Behavior-Version)  Correct functional level of this RODC:  7  Object DN:  CN=NTDS Settings,CN=LV-AD1-NL,CN=Servers,CN=London,CN=Sites,CN=Configuration,DC=euromonitor,DC=local  Writable DC name used in this attempt:  EUROAD1.euromonitor.local ",
-    "EventData": "<DataItem type=\"System.XmlData\" time=\"2017-12-09T13:35:11.9685067+00:00\" sourceHealthServiceId=\"295AE458-B650-95D4-AFC0-E07B865DAF6E\"><EventData xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"><Data>905b3 (msDS-Behavior-Version)</Data><Data>7</Data><Data>CN=NTDS Settings,CN=LV-AD1-NL,CN=Servers,CN=London,CN=Sites,CN=Configuration,DC=euromonitor,DC=local</Data><Data>EUROAD1.euromonitor.local</Data></EventData></DataItem>",
-    "SubscriptionId": "e44872b2-e898-46d0-800f-59752a564718",
-    "ResourceGroup": "OLIV8274-DRAD1",
-    "ResourceId":"/subscriptions/e44872b2-e898-46d0-800f-59752a564718/resourceGroups/OLIV8274-DRAD1/providers/Microsoft.Compute/virtualMachines/OH-DC-1"
-  }
-]"#>
-
- <#
+﻿ <#
     .SYNOPSIS
-    Smart Ticket Script to remediate Azure Alert Id: raxdirectoryservice
+    Smart Ticket Script to remediate Azure Alert Id: directoryservice
        
     .DESCRIPTION
     Smart Ticket will check the state of the AD VMs in Azure and update the ticket accordingly.
     Supported: Yes
-    Keywords: azure,smarttickets,raxdirectoryservice
+    Keywords: azure,smarttickets,directoryservice
     Prerequisites: No
     Makes changes: Yes
     .EXAMPLE
-    Full command:  .\raxdirectoryservice.ps1       
+    Full command:  .\directoryservice.paas.ps1       
     .OUTPUTS
     Example output:
 
-    [TICKET_UPDATE=PUBLIC]
-[TICKET_STATUS=ALERT RECEIVED]
+
 
 Hello,
 
-Review the Smart Ticket automation AD server report to help investigate AD replc
-iation issues.
+Review the Smart Ticket automation AD server report to help investigate AD replication issues.
 
 
 -----------------------------------------------
 AD Server DNS information and VM running state:
 -----------------------------------------------
 
-
-VM Name     : OH-DC-1
+VM Name     : DC-1
 VNET DNS    : {172.16.195.4, 172.16.195.5}
 NIC DNS     : No Custom DNS on NIC
 Power State : VM running
 VNET        : UKS-VNET01
 Subnet      : UKS-VNET01-AD-PRD
 
-VM Name     : OH-DC-2
+VM Name     : DC-2
 VNET DNS    : {172.16.195.4, 172.16.195.5}
 NIC DNS     : {172.16.195.4, 172.16.195.5}
 Power State : VM deallocated
@@ -62,10 +41,10 @@ Subnet      : UKS-VNET01-AD-PRD
 -----------------------------------------------
 AD Server health information:
 -----------------------------------------------
-subscriptionId : e44872b2-e898-46d0-800f-59752a564718
+subscriptionId : 13236a-ab3242234324-ASD123454-78090E
 location       : uksouth
-resourceGroup  : OLIV8274-DRAD1
-resource       : OH-DC-2
+resourceGroup  : RG1
+resource       : DC-2
 status         : Unknown
 summary        : We are currently unable to determine the health of this 
                  virtual machine
@@ -76,8 +55,8 @@ occuredTime    : 2018-08-08T15:38:16.3712445Z
 
 Network Security Group Information:
 ------------------------------------------
-Virtual Machine   : oh-dc-1
-Resource Group    : OLIV8274-DRAD1
+Virtual Machine   : dc-1
+Resource Group    : rg1
 Associated Subnet : UKS-VNET01-AD-PRD
 Outbound NSG      : UKS-VNET01-AD-PRD-NSG
 ------------------------------------------
@@ -104,9 +83,7 @@ An Azure engineer will continue to troubleshoot manually.
 
 Kind regards,
 
-Smart Ticket Automation
-Rackspace Toll Free (US): 1800 961 4454
-                    (UK): 0800 032 1667
+
 
 
     .NOTES
@@ -115,7 +92,7 @@ Rackspace Toll Free (US): 1800 961 4454
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Bob Larkin         :: 08-Aug-2018 :: XX-XXX   :: Bob Larkin  :: Release
+    1.0     :: Bob Larkin         :: 08-Aug-2018 :: XX-XXX   ::   :: Release
 #>
 
     
@@ -128,7 +105,7 @@ Rackspace Toll Free (US): 1800 961 4454
     #region Payload and variables
 
     #Set Test Mode: 1=Testing : 0=Production
-    $testMode = 1
+    $testMode = 0
 
     if ($testMode -eq 0)
     {       
@@ -138,20 +115,20 @@ Rackspace Toll Free (US): 1800 961 4454
     elseif ($testMode -eq 1)
     {
         #Testing payload
-        $object = ConvertFrom-Json "$(get-content -Path C:\Users\robe4172\Documents\ReplicationPayload.json)"
+        $object = ConvertFrom-Json "$(get-content -Path C:\Users\oliv8274\Desktop\payload\ad.json)"
     }
 
     #Set Payload variables
-    $VMName = ($object.Computer).ToLower()
+    $VMName = ($object.Computer).Split(".")[0]
     $Subscription = $object.SubscriptionId
     $ResourceGroup = $object.ResourceGroup
     $ResourceId = $object.ResourceId
 
      
     <#hard coded for testing REMOVE before QC#Set Payload variables
-    $VMName = "OH-DC-1"#($object.Computer).ToLower()
-    $Subscription = "e44872b2-e898-46d0-800f-59752a564718" #$object.SubscriptionId
-    $ResourceGroup = "OLIV8274-DRAD1" #$object.ResourceGroup
+    $VMName = "DC-1"#($object.Computer).ToLower()
+    $Subscription = "13236a-ab3242234324-ASD123454-78090E" #$object.SubscriptionId
+    $ResourceGroup = "RG1" #$object.ResourceGroup
     $ResourceId = $object.ResourceId
     #>
      
@@ -160,7 +137,7 @@ Rackspace Toll Free (US): 1800 961 4454
 $VM =  Get-AzureRmVM -Name $VMName -ResourceGroupName $ResourceGroup 
 #Get the NIC details
 $VM.NetworkProfile.NetworkInterfaces
-#$VM1 = Get-AzureRmVM -ResourceGroupName $ResourceGroup | Where-Object { $_.Name -eq "USSCDVIM003AD01"} | Get-AzureRmNetworkInterfaceIpConfig
+#$VM1 = Get-AzureRmVM -ResourceGroupName $ResourceGroup | Where-Object { $_.Name -eq "AD-VM-1"} | Get-AzureRmNetworkInterfaceIpConfig
 #Extract the last field which is NIC name
 $VMNIC =  $VM.NetworkProfile.NetworkInterfaces.id | split-path -Leaf
 #Get NIC details 
@@ -265,7 +242,7 @@ Foreach ($Server in $VMDCArray)
 
 #VM health 
 
-#Get Resource Health via REST API taken from raxunexpectedshutdown.paas.ps1
+#Get Resource Health via REST API , input is taken from external parameter
 function Get-AzureResourceHealth 
 {
    Param(
@@ -337,7 +314,7 @@ Foreach ($Server in $VMDCArray)
             $VMHealthOutput += $HealthDataResults 
         }
 }
-    #Adapted from raxbackupvaulterror.paas.ps1
+
 Function Get-OutboundNsg
 {
         try
@@ -374,14 +351,14 @@ Function Get-OutboundNsg
             if ($OutBoundNsg -ne $null)
             {
                 $NSGOutput = $null
-                $NSGOutput += "Network Security Group Information:`n------------------------------------------"
+                $NSGOutput += "Network Security Group Information:`n--------------------------------------------------"
                 $NSGOutput += "`nVirtual Machine   : $($VMName)"
                 $NSGOutput += "`nResource Group    : $($vm.ResourceGroupName)"
                 $NSGOutput += "`nAssociated Subnet : $($subnet)"
                 $NSGOutput += "`nOutbound NSG      : $($NsgName)"
-                $NSGOutput += "`n------------------------------------------`n`n"
+                $NSGOutput += "`n`n"
                 $NSGOutput += "Outbound NSG rules: Allow - HTTPS:`n"
-                $NSGOutput += "------------------------------------------`n"
+                $NSGOutput += "--------------------------------------------------`n"
                 if ($OutBoundNsgADports -ne $null)
                 {
                     $NSGOutput += "$($OutBoundNsgADports| Sort-Object Priority | Select-Object Name, Priority, Protocol, SourcePortRange, DestinationPortRange, SourceAddressPrefix, DestinationAddressPrefix, Access -First 5 | Format-Table | Out-String)"
@@ -424,23 +401,17 @@ Function Get-OutboundNsg
 }
 $NSGReport = Get-OutboundNsg
 
-$ticketSignature = "Kind regards,`n`nSmart Ticket Automation`nRackspace Toll Free (US): 1800 961 4454`n                    (UK): 0800 032 1667"
+$ticketSignature = "Kind regards,`n`n"
 
 
 
 
 Write-Output "[TICKET_UPDATE=PUBLIC]"
 Write-Output "[TICKET_STATUS=ALERT RECEIVED]`n"
-Write-Output "Hello,`n`nReview the Smart Ticket automation AD server report to help investigate AD replciation issues.`n`n"
-Write-Output "-----------------------------------------------"
-Write-Output "AD Server DNS information and VM running state:`n-----------------------------------------------"
-$($ADVMOutput)
-Write-Output "-----------------------------------------------"
-Write-Output "AD Server health information:`n-----------------------------------------------"
-$($VMHealthOutput)
-Write-Output "------------------------------------------`n"
+Write-Output "Hello,`n`nSmart Ticket automation has finished querying Azure. Please review the following Azure platform report:`n"
+Write-Output "Domain Controller VM Information:`n--------------------------------------------------$($ADVMOutput | Format-List | Out-String)"
+Write-Output "Azure Resource Health information:`n--------------------------------------------------$($VMHealthOutput | Out-String)"
+Write-Output ""
 $($NSGReport)
 Write-Output "An Azure engineer will continue to troubleshoot manually.`n`n"
 Write-Output "$($ticketSignature)"
-#Write-Output "[TICKET_PAAS_REMEDIATION=TRUE]"
-#Write-Output "[TICKET_PAAS_DEVICE=$($ResourceId)"

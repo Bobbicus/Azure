@@ -23,7 +23,7 @@
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
-    3.3     :: Chris Clark        :: 27-March-2018 :: MPA-20 ::Oliver Hurn  :: SQL backup Check
+
 #>
 
 param(
@@ -46,9 +46,6 @@ try {
       
 #>
     $jsonpayload = Invoke-RestMethod -Uri $PayLoadUrl
-    #test
-    #$jsonpayload = Invoke-RestMethod -Uri "https://raxsmarttickets.blob.core.windows.net/alert-payload-dev/samples/raxsqlbackuperror_payload_2Db.json?sv=2017-04-17&si=alert-payload-dev-15EA2944062&sr=c&sig=%2BrzZX7BaOpzeKQYQRhbVz%2F4ZG7lyZMB3dSDbkFGFSfE%3D"
-    #end test
     $regexDbnamePayload = [regex]'(?<=\bDATABASE \b).*?(?=\.)'#pull db name after DATABASE payload error Only
     $regexLognamePayload = [regex]'(?<=\bLOG ).*?(?=\.)'#pull db name after LOG Payload error Only
     [datetime]$Global:timeGenall =$jsonpayload.TimeGenerated | Select-Object -Last 1
@@ -122,12 +119,8 @@ function Compare-DbNames {
         #Check if payload data or event viewer data is returned as null
         if ($DbNamesPayload -eq $null -or $EvntDbNames -eq $null ){
             if ($EvntDbNames -ne $null){
-                Write-Output "`n`n[TICKET_UPDATE=PRIVATE]"
-                Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
                 Write-Output "Could not filter out database name from alert payload"}
             else{
-                Write-Output "`n`n[TICKET_UPDATE=PRIVATE]"
-                Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
                 Write-Output "There were no successful backups within the event viewer to compare. Please investigate database backup failure:"
                 Write-Output "------------------------------------"
                 Write-Output "Databases (Payload)"
@@ -137,21 +130,15 @@ function Compare-DbNames {
             }                
     else{
         if((Compare-Object -ReferenceObject ($EvntDbNames) -DifferenceObject ($DbNamesPayload) -PassThru | Where-Object {$EvntDbNames -NotContains $_}).count -eq 0){ #Test error by placing 1 in the count
-            Write-Output "`n`n[TICKET_UPDATE=PUBLIC]"
-            Write-Output "[TICKET_STATUS=CONFIRM SOLVED]"
             Write-Output "Hello Team,"
             Write-Output "`nUpon the first attempt, each database backup job failed due to a process potentially locking access to its underlying files. A second attempt was retried automatically, which completed successfully for all listed databases:`n"
             Write-Output "------------------------------------"
                 foreach($dbnamePayload in $DbNamesPayload){Write-Output $dbnamePayload}
                     Write-Output "------------------------------------"
-                    Write-Output "`nRackspace automation has confirmed this via Event Viewer records. Please feel free to update this ticket if you have any questions."
-                    Write-Output "`nKind regards,"
-                    Write-Output "`nMicrosoft Azure Engineer"
-                    Write-Output "Rackspace Toll Free: (800) 961-4454"}
+                    Write-Output "`nAutomation has confirmed this via Event Viewer records. Please feel free to update this ticket if you have any questions."
+                    Write-Output "`nKind regards,"}
         else{
             [array]$DbsNotFound += Compare-Object -ReferenceObject ($EvntDbNames) -DifferenceObject ($DbNamesPayload) -PassThru | Where-Object {$EvntDbNames -NotContains $_}
-            Write-Output "`n[TICKET_UPDATE=PRIVATE]"
-            Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
             Write-Output "Smart Ticket remediation has cross-referenced the Database Name(s) in the JSON payload against successful backup record(s) found in the Event Viewer:`n" 
             Write-Output "------------------------------------"
             Write-Output "Databases (Payload)"

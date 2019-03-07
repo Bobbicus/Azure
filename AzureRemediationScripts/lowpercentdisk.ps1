@@ -34,12 +34,10 @@
      | 70            | 69.36          | 256                      | 99.08%      | 
      +---------------+----------------+--------------------------+-------------+
 
-    As the free disk space is now above the above 1% alert threshold for the D: drive, we will mark this ticket as 'Confirm Solved'. Although the alert has cleared, please review your disk usage and ensure you have sufficient space on VM: jumpy for your solution to run smoothly. If you have any questions, or require further assistance, please contact Rackspace Support to discuss further.
+    As the free disk space is now above the above 1% alert threshold for the D: drive, we will mark this ticket as 'Confirm Solved'. Although the alert has cleared, please review your disk usage and ensure you have sufficient space on VM: jumpy for your solution to run smoothly. If you have any questions, or require further assistance, please contact Support to discuss further.
 
     Kind regards,
 
-    Microsoft Azure Engineer
-    Rackspace Toll Free: (800) 961-4454
 
         
     .NOTES
@@ -49,8 +47,6 @@
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Oliver Hurn        :: 01-APR-2017 :: XX-XXX   :: Bob Larkin  :: Release
-    1.1     :: Oliver Hurn        :: 19-JUL-2017 :: XX-XXX   :: Bob Larkin  :: Changed Diagnostic report Output
 #>
 
    #Script Uri
@@ -65,7 +61,7 @@ Function Get-DiskSpaceAlert
 
     #region Testing
     #uncomment for testing
-    #$object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\lowpecentdisk.json)"
+    #$object = ConvertFrom-Json "$(get-content -Path C:\temp\lowpecentdisk.json)"
     
     #endregion
 
@@ -80,7 +76,7 @@ Function Get-DiskSpaceAlert
     $Threshold = '1'
 
     #Ticket Signature
-    $ticketSignature = "Kind regards,`n`nSmart Ticket Automation`nRackspace Toll Free (US): 1800 961 4454`n                    (UK): 0800 032 1667"  
+    $ticketSignature = "Kind regards"  
 
     #################### Helper Functions - BEGIN ####################
     #region 
@@ -193,14 +189,10 @@ Function Get-DiskSpaceAlert
         If the input is any other data type which will not be converted but instead retruned.   
 
     .NOTES
-       Wiki = https://one.rackspace.com/display/IAW/ConvertTo-ASCII
 
        Version Table:
         Version :: Author         :: Live Date   :: JIRA       :: QC             :: Description
         -----------------------------------------------------------------------------------------------------------
-        1.0     :: Mark Wichall   :: 03-MAR-2016 :: IAWW-000   :: Martin Howlett :: Release
-        1.1     :: Mark Wichall   :: 07-MAR-2017 :: IAWW-469   :: Martin Howlett :: Update code to current standard and suggestions John Luikart made
-        1.2     :: Mark Wichall   :: 16-MAR-2017 :: IAWW-469   :: Martin Howlett :: fixed formating to add option to escape \ for wham templates 
         1.3     :: Mark Wichall   :: 19-MAY-2017 :: IAWW-1269  :: Martin Howlett :: removed out-string of ascii table as it was adding a following line
     #>
 
@@ -1165,7 +1157,7 @@ Function Get-DiskSpaceAlert
     $OutputReport = @()
     $OutputReport += "[TICKET_UPDATE=PUBLIC]"
     $OutputReport += "[TICKET_STATUS=ALERT RECEIVED]"
-    $OutputReport += "Hello Team,`n`nThe alert is still active and requires a Racker to review the automated output and troubleshoot accordingly. In the meantime, please feel free to review the 'Top 10 largest Files' report and help us recover the necessary disk space above the $($Threshold)% threshold:`n "  
+    $OutputReport += "Hello Team,`n`nThe alert is still active and requires an engineer to review the automated output and troubleshoot accordingly. In the meantime, please feel free to review the 'Top 10 largest Files' report and help us recover the necessary disk space above the $($Threshold)% threshold:`n "  
     $OutputReport += "Virtual Machine  : $($OSInfo.VM)"
     $OutputReport += "Operating System : $($OSInfo.OS)"
     $OutputReport += "IPv4 Address     : $($OSinfo.IP)"
@@ -1198,7 +1190,7 @@ Function Get-DiskSpaceAlert
     $OutputReport += "Disk Status:"
     $OutputReport += $($output."Disk" | out-string)
 
-    $OutputReport += "As the free disk space is now above the above $($Threshold)% alert threshold for the $($DriveLetter) drive, we will mark this ticket as 'Confirm Solved'. Although the alert has cleared, please review your disk usage and ensure you have sufficient space on VM: $($OSInfo.VM) for your solution to run smoothly. If you have any questions, or require further assistance, please contact Rackspace Support to discuss further.`n`n"
+    $OutputReport += "As the free disk space is now above the above $($Threshold)% alert threshold for the $($DriveLetter) drive, we will mark this ticket as 'Confirm Solved'. Although the alert has cleared, please review your disk usage and ensure you have sufficient space on VM: $($OSInfo.VM) for your solution to run smoothly. If you have any questions, or require further assistance, please contact Support to discuss further.`n`n"
     $OutputReport += "$($ticketSignature)"
     }
           

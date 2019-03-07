@@ -11,7 +11,7 @@
     Makes changes: Yes
 
     .EXAMPLE
-    Full command:  .\raxbackupvaulterror.paas.ps1
+    Full command:  .\backupvaulterror.paas.ps1
     Description: Initiates a backup job and outputs on success or failure.
        
     .OUTPUTS
@@ -23,36 +23,34 @@
 
     Backup Job Status (Before remediation):
     ------------------------------------------------------------
-    VM Workload   : OH-DC-1
+    VM Workload   : DC-1
     Power State   : VM running
-    Vault         : oliv8274-rsv
-    ResourceGroup : oliv8274-drad1
-    Subscription  : e44872b2-e898-46d0-800f-59752a564718
+    Vault         : 1234-rsv
+    ResourceGroup : 1234-ad1
+    Subscription  : 123412341234-46d0-800f-sdaffdsaf1324544
     Status        : Failed
-    Start Time    : 04/10/2018 11:24:16
-    End Time      : 04/10/2018 11:24:17
-    Backup Job Id : 24cd69a6-9592-47fa-84bd-48eff33bae4c
+    Start Time    : 04/09/2018 13:24:16
+    End Time      : 04/09/2018 13:24:17
+    Backup Job Id : 123412341234-46d0-800f-sdaffdsaf1324544
     ------------------------------------------------------------
 
     Backup Job Status (After remediation):
     ------------------------------------------------------------
-    VM Workload   : OH-DC-1
+    VM Workload   : DC-1
     Power State   : VM running
-    Vault         : oliv8274-rsv
-    ResourceGroup : oliv8274-drad1
-    Subscription  : e44872b2-e898-46d0-800f-59752a564718
+    Vault         : 12345-rsv
+    ResourceGroup : 12345-ad1
+    Subscription  : 123412341234-46d0-800f-sdaffdsaf1324544
     Status        : InProgress
-    Start Time    : 04/11/2018 10:22:46
+    Start Time    : 04/10/2018 12:22:46
     End Time      : 
-    Backup Job Id : 7cfd259e-43fb-4cc4-91a9-115251ec9178
+    Backup Job Id : 123412341234-46d0-800f-sdaffdsaf1324544
     ------------------------------------------------------------
 
     Remediation is complete. Please feel free to update this ticket if you have any questions.
 
     Kind regards,
 
-    Smart Ticket Automation.
-    Rackspace Toll Free: (800) 961-4454
 
         
     .NOTES
@@ -62,8 +60,7 @@
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Oliver Hurn        :: 07-JUN-2018 :: XX-XXX   :: Bob Larkin  :: Release
-    1.1     :: Oliver Hurn        :: 14-JUN-2018 :: XX-XXX   :: Chris Clark :: Minor Fix #line 377
+
 #>
 
     #region Payload
@@ -74,9 +71,7 @@
     #>
 
     #Testing payload
-    #$object = ConvertFrom-Json "$(get-content -Path C:\Users\oliv8274\Desktop\payload\rsv.json)"
-    #$object = ConvertFrom-Json "$(get-content -Path C:\Users\oliv8274\Desktop\payload\nsg.json)"
-    #$object = ConvertFrom-Json "$(get-content -Path C:\Users\oliv8274\Desktop\payload\vmstate.json)"
+    #$object = ConvertFrom-Json "$(get-content -Path C:\documents\payload\rsv.json)"
 
 try
 {    
@@ -94,7 +89,7 @@ try
         $RsvName = $object.ResourceId | Split-Path -Leaf
         #endregion
         
-        $ticketSignature = "Kind regards,`n`nSmart Ticket Automation`nRackspace Toll Free (US): 1800 961 4454`n                    (UK): 0800 032 1667"
+        $ticketSignature = "Kind regards,`n`n"
 
     #Function to check recent failed backup jobs and stop the REQUIRE FEEDBACK loop through blind auto-remediation. 
     #$Amount is the number of failed jobs to stop the loop at.
@@ -111,7 +106,7 @@ try
             #Collect all failed Backup jobs for $Workload (Range: 3 days, First 2 records)
             $FailedJobs = Get-AzureRmRecoveryServicesBackupJob -From (Get-Date).AddDays(-($Amount+1)).ToUniversalTime() -Status Failed | Where-Object {$_.WorkloadName -eq $Workload} 
 
-            #If the last two jobs have failed, Racker intevention is required.
+            #If the last two jobs have failed intevention is required.
             if ($FailedJobs.Count -ge $Amount)
             {
                 #Build validation Output
@@ -121,7 +116,7 @@ try
                 $OutputStop += "------------------------------`n"
                 $OutputStop += "Smart Ticket Validation Check:`n"
                 $OutputStop += "------------------------------`n"
-                $OutputStop += "$($Amount) or more failed backup jobs found for Workload: $($Workload) in the last $($Amount+1) days. Racker investigation required.`n`n"
+                $OutputStop += "$($Amount) or more failed backup jobs found for Workload: $($Workload) in the last $($Amount+1) days. investigation required.`n`n"
                 $OutputStop += "$($FailedJobs | Select-Object -First $Amount | Format-Table -AutoSize | Out-String)"                
                 
                 #Output
@@ -209,7 +204,7 @@ try
                 $ExtOutput += "Failed Extensions :`n"
                 $ExtOutput += "------------------------------------------------------------`n"
                 $ExtOutput += "$FailedExt"
-                $ExtOutput += "A Racker will review the Failed Extensions report and delete the necessary extension to resolve the VM's Failed PowerState. If this doesn't resolve the issue, a reboot may be required.`n`n"
+                $ExtOutput += "We will review the Failed Extensions report and delete the necessary extension to resolve the VM's Failed PowerState. If this doesn't resolve the issue, a reboot may be required.`n`n"
                 $ExtOutput += "$($ticketSignature)"
             }
             else
@@ -353,7 +348,7 @@ try
             #Collect all failed Backup jobs for $Workload (Range: 3 days, First 2 records)
             $FailedJobs = Get-AzureRmRecoveryServicesBackupJob -From (Get-Date).AddDays(-($Amount+1)).ToUniversalTime() -Status Failed | Where-Object {$_.WorkloadName -eq $Workload} 
 
-            #If the last two jobs have failed, Racker intevention is required.
+            #If the last two jobs have failed, intevention is required.
             if ($FailedJobs.Count -ge $Amount)
             {
                 #Build validation Output
@@ -363,7 +358,7 @@ try
                 $Output0 += "-----------------------------`n"
                 $Output0 += "Smart Ticket Validation: FAIL`n"
                 $Output0 += "-----------------------------`n"
-                $Output0 += "$($Amount) or more failed backup jobs found for Workload: $($Workload) in the last $($Amount+1) days. Racker investigation required.`n`n"
+                $Output0 += "$($Amount) or more failed backup jobs found for Workload: $($Workload) in the last $($Amount+1) days. investigation required.`n`n"
                 $Output0 += "$($FailedJobs | Format-Table -AutoSize | Out-String)"                
                 
                 #Output
@@ -453,7 +448,7 @@ try
                     $Output2 += "Error Message    : $($backupVM.ErrorDetails.ErrorMessage)`n"
                     $Output2 += "Recommendation   : $($backupVM.ErrorDetails.Recommendations)"
                     $Output2 += "`n--------------------------------------------------------`n`n"
-                    $Output2 += "A Racker will investigate further as the Backup Job failed its retry attempt. Review the above Error Message for more details.`n`n"
+                    $Output2 += "We will investigate further as the Backup Job failed its retry attempt. Review the above Error Message for more details.`n`n"
                     $Output2 += "$($ticketSignature)"
                  
                     #Failure Output
@@ -535,7 +530,6 @@ try
             $CatchOutput += "[TICKET_UPDATE=PRIVATE]"
             $CatchOutput += "[TICKET_STATUS=ALERT RECEIVED]`n"
             $CatchOutput += "Unrecognised PaaS FailureDetails property. Please review the following Smart Ticket Script wiki for what is recognised:`n`n"
-            $CatchOutput += "https://one.rackspace.com/pages/viewpage.action?title=Smart+Tickets+Scripts&spaceKey=FSFA#SmartTicketsScripts-raxbackupvaulterror.ps1`n`n"
             $CatchOutput += "-------------------------`n"
             $CatchOutput += "Failed Backup Job Report:`n"
             $CatchOutput += "-------------------------`n"

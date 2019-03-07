@@ -25,7 +25,7 @@
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Bob Larkin         :: 28-Nov-2017 :: N/A      :: Oliver Hurn  :: Release
+    1.0     :: Bob Larkin         :: 28-Nov-2017 :: N/A      ::   :: Release
 #>
 
 Param(    
@@ -63,7 +63,7 @@ Function Get-DFSRState
             $ErrorID = $object.EventID
             
             <#Logic to add to test against a local payload
-            $object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\payload.json)" 
+            $object = ConvertFrom-Json "$(get-content -Path C:\temp\payload.json)" 
             $ErrorID = $object.SearchResults.value.EventID
             or hard code the Error IDs
             #$ErrorID = "4612","5002"
@@ -235,8 +235,6 @@ Function Get-DFSRState
                    if ($DFSAllAlertState -contains "Unresolved" -and $DFSAllAlertState  -notcontains "No Logs")
                      {
                         #Private update and keep ticket open.  Add Information for tech to aid troubleshooting.
-                        Write-Output "[TICKET_UPDATE=PRIVATE]"
-                        Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
                         Write-Output "Hello Team,`n`n"
                         Write-Output "This alert has not cleared. Please review the table below to see which alerts are in an 'Unresolved' state and thus require further investigation."
                         Write-Output "`nVirtual Machine  : $($OSInfo.VM)"
@@ -247,15 +245,13 @@ Function Get-DFSRState
                         Write-Output "`n-------------------------------------------`n"
                         Write-Output  $DFSServiceState
                         Write-Output "`nMaking private update, marking ticket in alert recieved."
-                        Write-Output "`n`nMicrosoft Azure Engineer"
-                        Write-Output "Rackspace Toll Free: (800) 961-4454"
+                        Write-Output "`n`nAzure Engineer"
+
                      }
                      #If the output contains no logs only it may be that logs have been cleared.
                      if ($DFSAllAlertState -contains "No Logs" -and $DFSAllAlertState  -notcontains "Cleared" -and $DFSAllAlertState -notcontains "Unresolved")
                      {
                         #Private update and keep ticket open.  Add Information for tech to aid troubleshooting.
-                        Write-Output "[TICKET_UPDATE=PRIVATE]"
-                        Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
                         Write-Output "Hello Team,`n`n"                       
                         Write-Output "No error events or good events were found in the logs. The DFS replication event log may have been cleared since this alert was triggered."
                         Write-Output "`nVirtual Machine  : $($OSInfo.VM)"
@@ -271,8 +267,6 @@ Function Get-DFSRState
                      if ($DFSAllAlertState -contains "No Logs" -and ($DFSAllAlertState  -contains "Cleared" -or $DFSAllAlertState -contains "Unresolved"))
                      {
                         #Private update and keep ticket open.  Add Information for tech to aid troubleshooting.
-                        Write-Output "[TICKET_UPDATE=PRIVATE]"
-                        Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
                         Write-Output "Hello Team,`n`n"                      
                         Write-Output "There are mutliple alerts, investigate the ones where there are no logs present, or where they are in a Unresolved state."
                         Write-Output "`nVirtual Machine  : $($OSInfo.VM)"
@@ -287,10 +281,9 @@ Function Get-DFSRState
                      #If the state does not contain NoLogs or Alert Active it means there are only good results and all alerts have cleared so ticket can be confirm solved
                      if ($DFSAllAlertState -notcontains "No Logs" -and $DFSAllAlertState  -notcontains "Unresolved" -and $DFSServiceState -contains "The DFSR Service is in a running state.")
                      {
-                        Write-Output "[TICKET_UPDATE=PUBLIC]"
-                        Write-Output "[TICKET_STATUS=CONFIRM SOLVED]"
+
                         Write-Output "Hello Team,`n`n" 
-                        Write-Output "The alert cleared without intervention from Rackspace. Below is a list of the Error events and corresponding events where the alert has cleared."
+                        Write-Output "The alert cleared without intervention from DevOpsGroup. Below is a list of the Error events and corresponding events where the alert has cleared."
                         Write-Output "`nVirtual Machine  : $($OSInfo.VM)"
                         Write-Output "Operating System : $($OSInfo.OS)"
                         Write-Output "IPv4 Address     : $($OSinfo.IP)" 
@@ -300,15 +293,12 @@ Function Get-DFSRState
                         Write-Output  $DFSServiceState
                         Write-Output "`nAs the alert has cleared we will mark this ticket as confirm solved. If you have any questions please let us know."
                         Write-Output "`n`nKind Regards,"
-                        Write-Output "Microsoft Azure Engineer"
-                        Write-Output "Rackspace Toll Free: (800) 961-4454"
+                        Write-Output "Azure Engineer"
                      }
                      if ($DFSAllAlertState -notcontains "No Logs" -and $DFSAllAlertState  -notcontains "Unresolved" -and $DFSServiceState -contains "The DFSR service is in a Stopped state.")
                      {
-                        Write-Output "[TICKET_UPDATE=PRIVATE]"
-                        Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
                         Write-Output "Hello Team,`n`n" 
-                        Write-Output "The alert cleared without intervention from Rackspace, but the DFSr service is in a stopped state. Below is a list of the Error events and corresponding events where the alert has cleared."
+                        Write-Output "The alert cleared without intervention from DevOpsGroup, but the DFSr service is in a stopped state. Below is a list of the Error events and corresponding events where the alert has cleared."
                         Write-Output "`nVirtual Machine  : $($OSInfo.VM)"
                         Write-Output "Operating System : $($OSInfo.OS)"
                         Write-Output "IPv4 Address     : $($OSinfo.IP)" 
@@ -318,8 +308,8 @@ Function Get-DFSRState
                         Write-Output  $DFSServiceState
                         Write-Output "`nThe alert has cleared, but you need to investigate why the DFSR service is stopped."
                         Write-Output "`n`nKind Regards,"
-                        Write-Output "Microsoft Azure Engineer"
-                        Write-Output "Rackspace Toll Free: (800) 961-4454"
+                        Write-Output "Azure Engineer"
+
                      }
             
         }
@@ -329,8 +319,7 @@ Function Get-DFSRState
             $ErrMsg = "Powershell exception :: Line# $($_.InvocationInfo.ScriptLineNumber) :: $($_.Exception.Message)"
             Write-Output "Script failed to run."
             Write-Output $ErrMsg
-            Write-Output "[TICKET_UPDATE=PRIVATE]"
-            Write-Output "[TICKET_STATUS=ALERT RECEIVED"
+
         }
 
 }

@@ -38,13 +38,6 @@
     Version Table:
     Version :: Author         :: Live Date   :: JIRA     :: QC             :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Mark Wichall   :: 08-FEB-2016 :: IAWW-000 :: Martin Howlett :: Release
-    1.1     :: Martin Howlett :: 01-AUG-2016 :: IAWW-000 :: Mark Wichall   :: Fixed output bug with \r
-    1.2     :: Oliver Hurn    :: 13-OCT-2016 :: IAWW-000 :: ------         :: Adjusted Output for Azure Smart Tickets
-    1.21    :: Oliver Hurn    :: 05-NOV-2017 ::		     :: Bob Larkin     :: Added User Process Details Function and removed hardware checks. Released for Azure Smart Tickets.
-    1.3	    :: Oliver Hurn    :: 24-NOV-2017 ::		     :: Bob Larkin     :: Added Remedation logic to set ticket status to Confirm Solved if CPU% under 75% and changed Services function
-    1.4	    :: Oliver Hurn    :: 04-DEC-2017 ::		     :: Bob Larkin     :: Added Remedation logic for MSSQL and IIS ticket closure. PIlot phase.
-    1.5	    :: Oliver Hurn    :: 04-JUL-2018 ::		     :: Bob Larkin     :: Updated MSSQL output to Public
 #>
 
 Function Resolve-CpuAlerts {
@@ -56,7 +49,7 @@ Try{
     $cpuThreshold = '75'
 
     #Signature variable
-    $ticketSignature = "Kind regards,`n`nSmart Ticket Automation`nRackspace Toll Free (US): 1800 961 4454`n                    (UK): 0800 032 1667"
+    $ticketSignature = "Kind regards,`n`n"
 
     #region ascii
     #####################
@@ -71,10 +64,6 @@ Try{
     .EXAMPLE
        Get-ASCIITable -PSOArray $Data -AddLines -List
     .NOTES
-       Author = Mark Wichall
-       Version = 0.3
-       Updated = 03/03/16
-       Wiki = https://one.rackspace.com/display/IAW/ConvertTo-ASCII
     #>
     Function ConvertTo-ASCII{
             Param
@@ -890,9 +879,7 @@ Try{
 
     #MSSQL: Check whether CPU% counter has is above 75% and if so, update and set ticket to Confirm Solved status
     elseif ($ProcDetails[0].'%ProcessorTime' -gt $cpuThreshold -and $ProcDetails[0].ProcessName -like '*sqlservr*')
-            {
-                $Output = $Output + "[TICKET_UPDATE=PUBLIC]"
-                $Output = $Output + "[TICKET_STATUS=CONFIRM SOLVED]"             
+            {          
                 $Output = $Output + "Hello Team,`n"
                 $Output = $Output + "Microsoft SQL Server is one of the main processess using a high percentage of the VM's CPU:`n"
                 $Output = $Output + "   VM:  $($env:computername)"
@@ -900,15 +887,13 @@ Try{
                 $Output = $Output + "   IP:  $($LocalIpAddress)`n"
                 $Output = $Output + "Process Details (Top 5) - ordered by CPU%:"
                 $Output = $Output + $(ConvertTo-ASCII -data $script:ProcDetails2 -NoAddBlankLine -SortNameSwitch "ProcessName")
-                $Output = $Output + "`nThis can be considered normal behaviour for a MSSQL Server, therefore, please review your instance resources and let us know if you need any further assistance. Rackspace DBA Services are available for customers that require SQL performance-related optimisation, please reply to this ticket or reach out to your Account Manager accordingly. This ticket will be set to Confirm Solved status and we will continue to monitor the VM for any further alerts; if you have any questions please let us know."
+                $Output = $Output + "`nThis can be considered normal behaviour for a MSSQL Server, therefore, please review your instance resources and let us know if you need any further assistance. This ticket will be set to Solved status and we will continue to monitor the VM for any further alerts; if you have any questions please let us know."
                 $Output = $Output + "`n"
                 $Output = $Output + "$($ticketSignature)"
             }
     #IIS: Check whether CPU% counter is above 75% and if so, update and set ticket to Confirm Solved status
     elseif ($ProcDetails[0].'%ProcessorTime' -gt $cpuThreshold -and $ProcDetails[0].ProcessName -like '*w3wp*')
-            {
-                $Output = $Output + "[TICKET_UPDATE=PRIVATE]"
-                $Output = $Output + "[TICKET_STATUS=ALERT RECEIVED]"             
+            {         
                 $Output = $Output + "Hello Team,`n"
                 $Output = $Output + "Microsoft Internet Information Services (IIS) is one of the main processess using a high percentage of the VM's CPU:`n"
                 $Output = $Output + "   VM:  $($env:computername)"
@@ -923,9 +908,7 @@ Try{
             }
     #CPU LOW: Check whether CPU% counter has dropped below 75% and if so, update and set ticket to Confirm Solved status
     elseif ($ProcDetails[0].'%ProcessorTime' -lt $cpuThreshold)
-            {
-                $Output = $Output + "[TICKET_UPDATE=PUBLIC]"
-                $Output = $Output + "[TICKET_STATUS=CONFIRM SOLVED]"                
+            {              
                 $Output = $Output + "Hello Team,`n"
                 $Output = $Output + "Smart Ticket automation has detected that high CPU usage has dropped below the $($cpuThreshold)% threshold:`n"
                 $Output = $Output + "   VM:  $($env:computername)"
@@ -941,8 +924,6 @@ Try{
     else
             {
                 $Output = $Output + "Error running Script via Smart Ticket Engine."
-                $Output = $Output + "[TICKET_UPDATE=PRIVATE]"
-                $Output = $Output + "[TICKET_STATUS=ALERT RECEIVED]"
             }
     #escape any backslash so BBcode does not parse it as new lines etc
     #the double \ in the first entry is becausde its regex so we need to escape the slash as a literal character

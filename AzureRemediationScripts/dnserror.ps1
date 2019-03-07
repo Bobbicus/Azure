@@ -26,11 +26,8 @@
 
         Error Event  ID: 4013
 
-        Marking ticket confirm solved.
+        Marking ticket solved.
 
-
-        Microsoft Azure Engineer
-        Racksapce Toll Free: (800) 961-4454
 
 
     .OUTPUTS
@@ -42,8 +39,8 @@
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Bob Larkin         :: 31-Oct-2017 :: N/A      :: Chris Clark  :: Release
-    1.1     :: Bob Larkin         :: 28-Nov-2017 :: N/A      :: Oliver Hurn  :: Release
+    1.0     :: Bob Larkin         :: 31-Oct-2017 :: N/A      ::   :: Release
+    1.1     :: Bob Larkin         :: 28-Nov-2017 :: N/A      ::   :: Release
 #>
 Param(
     [Parameter(Mandatory=$false)]$PayloadUri
@@ -62,8 +59,6 @@ Function Get-DNSState
     {
          Write-Output "Hello Team,`n"
          Write-Output "`nThis alert has not cleared, the script ran but failed to find the DNS service. Please investigate further."
-         Write-Output "[TICKET_UPDATE=PRIVATE]"
-         Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
          exit
     }
      if ($DNSService.Status -eq "Running")
@@ -124,7 +119,7 @@ Function Get-DNSState
          
       <#   
             #This logic is for when we can read the payload
-            $object = ConvertFrom-Json "$(get-content -Path C:\rs-pkgs\payload.json)" 
+            $object = ConvertFrom-Json "$(get-content -Path C:\temp\payload.json)" 
             $ErrorIDAll = $object.SearchResults.value.EventID
             #will there be more than one event ID on any ticket ? 
 
@@ -227,7 +222,7 @@ Function Get-DNSState
              if ($DNSState.AlertState   -eq "Good")
              {
                 Write-Output "Hello Team,"
-                Write-Output "`nThe alert cleared without intervention from Rackspace. The latest good event ID is more recent than the error event. Review the details below for more information:`n"
+                Write-Output "`nThe alert cleared without intervention from DevOpsGroup. The latest good event ID is more recent than the error event. Review the details below for more information:`n"
                 Write-Output "`nVirtual Machine  : $($OSInfo.VM)"
                 Write-Output "Operating System : $($OSInfo.OS)"
                 Write-Output "IPv4 Address     : $($OSinfo.IP)`n"  
@@ -254,10 +249,7 @@ Function Get-DNSState
                 Write-Output "-----------------------------------------------------"
                 Write-Output "`nAs this alert has cleared we will mark this ticket as confirm solved. If you have any questions please let us know."
                 Write-Output "`n`nKind Regards,"
-                Write-Output "`nMicrosoft Azure Engineer"
-                Write-Output "Rackspace Toll Free: (800) 961-4454"
-                Write-Output "[TICKET_UPDATE=PUBLIC]"
-                Write-Output "[TICKET_STATUS=CONFIRM SOLVED]"
+                Write-Output "`nAzure Engineer"
              }
              if ($DNSState.AlertState -eq "Bad")
              {
@@ -287,8 +279,6 @@ Function Get-DNSState
                 Write-Output "-----------------------------------------------------"
                 Write-Output $DNSServiceState
                 Write-Output "-----------------------------------------------------"
-                Write-Output "[TICKET_UPDATE=PRIVATE]"
-                Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
              }
              if ($DNSState -eq "NoLogs")
              {
@@ -299,8 +289,6 @@ Function Get-DNSState
                 Write-Output "Operating System : $($OSInfo.OS)"
                 Write-Output "IPv4 Address     : $($OSinfo.IP)" 
                 Write-Output "`nPlease Investigate further.`n"
-                Write-Output "[TICKET_UPDATE=PRIVATE]"
-                Write-Output "[TICKET_STATUS=ALERT RECEIVED]"
              }
              #if false, restart the DNS service and then recheck the eventlog
              <#
@@ -318,10 +306,7 @@ Function Get-DNSState
                         
                         Write-Output "Hello Team,`n`nDNS service restarted."
                         Write-Output "DNS State Good after service restart"
-                        Write-Output "`n`nMicrosoft Azure Engineer"
-                        Write-Output "Rackspce Toll Free: (800) 961-4454"
-                        Write-Output "[TICKET_UPDATE=PUBLIC]"
-                        Write-Output "[TICKET_STATUS=CONFIRM SOLVED]"
+                        Write-Output "`n`n Azure Engineer"
                     }
                     #>  
                                   

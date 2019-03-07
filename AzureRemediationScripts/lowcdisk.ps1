@@ -10,7 +10,6 @@
     - Makes changes: Yes
     - Changes Made: 
         Empties recycle bin
-        Empties rs-pkgs folder
         Enables ntfs compression on certain folders
     - Column Header: Disk space alert
     - Script time out (min): 15
@@ -29,16 +28,6 @@
     Version Table:
     Version :: Author         :: Live Date   :: JIRA      :: QC             :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Martin Howlett :: 06-OCT-2015 :: IAWW-000  :: Mark Wichall   :: Release
-    1.1     :: Martin Howlett :: 01-AUG-2016 :: IAWW-000  :: Mark Wichall   :: fixed output bug with \r
-    1.2     :: Martin Howlett :: 03-FEB-2017 :: IAWW-1189 :: Mark Wichall   :: disabling template for ipsos and metro due to DRFS bug
-    1.3     :: Mark Wichall   :: 21-FEB-2017 :: IAWW-1189 :: Martin Howlett :: Added function Start-JobTimeout, and additional checks to prevent perfomance issues 
-    2.0     :: John Luikart   :: 22-FEB-2017 :: IAWW-469  :: Mark Wichall   :: remediation options and steps added.
-    2.1     :: Mark Wichall   :: 12-MAR-2017 :: IAWW-469  :: Martin Howlett :: Update ascii function , fixes formating issues.
-    3.0     :: Mark Wichall   :: 18-MAY-2017 :: IAWW-1269 :: Martin Howlett :: Add number of file check on disk, update information, updated reporting, added additional recomendations.
-    3.1     :: Mark Wichall   :: 07-JUN-2017 :: IAWW-1440 :: Martin Howlett :: bug fix for ascii art params
-    3.2     :: Oliver Hurn    :: 13-OCT-2017 :: IAWW-00 0 :: Bob Larkin     :: Adjusted Output for Azure Smart Tickets and modified $DriveLetter parameter.
-    3.3     :: Oliver Hurn    :: 20-DEC-2017 :: IAWW-00 0 :: Bob Larkin          :: Added Remediation, logging and reduced output size.	
 #>
 
 Function Resolve-DiskSpaceAlert
@@ -60,7 +49,7 @@ try{
     if (-not $force) 
     {        
         #confirm run remediation locally
-        if((Read-Host "REMEDIATE the alert(Y/N)? Makes Changes,proceed with Caution (see https://rax.io/Resolve-DiskSpaceAlert), proceed with Caution.") -like "y*")
+        if((Read-Host "REMEDIATE the alert(Y/N)? Makes Changes,proceed with Caution, proceed with Caution.") -like "y*")
         {
             $Remediate = "Y"
         }
@@ -192,14 +181,11 @@ try{
         If the input is any other data type which will not be converted but instead retruned.   
 
     .NOTES
-       Wiki = https://one.rackspace.com/display/IAW/ConvertTo-ASCII
+
 
        Version Table:
         Version :: Author         :: Live Date   :: JIRA       :: QC             :: Description
         -----------------------------------------------------------------------------------------------------------
-        1.0     :: Mark Wichall   :: 03-MAR-2016 :: IAWW-000   :: Martin Howlett :: Release
-        1.1     :: Mark Wichall   :: 07-MAR-2017 :: IAWW-469   :: Martin Howlett :: Update code to current standard and suggestions John Luikart made
-        1.2     :: Mark Wichall   :: 16-MAR-2017 :: IAWW-469   :: Martin Howlett :: fixed formating to add option to escape \ for wham templates 
         1.3     :: Mark Wichall   :: 19-MAY-2017 :: IAWW-1269  :: Martin Howlett :: removed out-string of ascii table as it was adding a following line
     #>
 
@@ -1047,7 +1033,7 @@ try{
 
         .EXAMPLE
         Adds an entry to a log file
-        Log-Changes -Date -Data "Write help for function -LogFile C:\rs-pkgs\todolist.txt" -Date
+        Log-Changes -Date -Data "Write help for function -LogFile C:\temp\todolist.txt" -Date
 
         .OUTPUT
         String add to text file
@@ -1238,78 +1224,6 @@ try{
             Return $Output
         }
     }
-
-    Function Clear-RSPkgs{
-        Param(
-            [Parameter(Mandatory=$true)]$DriveLetter
-        )
-        try{
-            $ListOfFilesRemoved = New-Object System.Collections.Generic.List[System.Object]
-            $RemovalFailed = New-Object System.Collections.Generic.List[System.Object]
-            $ListOfFoldersRemoved = New-Object System.Collections.Generic.List[System.Object]
-            $Before = Get-FolderSize $DriveLetter\rs-pkgs
-            $Output = New-Object PSObject -Property @{
-                "Items Removed" = ''
-                "Removal Failed" = ''
-                "Space Recovered (GB)" = ''
-                "ErrorMsg" = $null
-            }
-            ## Remove Folders ##
-            #if the folder has the words "not" and "delete" or contains #-#
-            $Folders = Get-ChildItem $DriveLetter\rs-pkgs -Force | Where-Object {
-            $_.psiscontainer -eq $true `
-                -and $_.Name -notmatch "\d-\d" `
-                -and $_.Name -notlike "*delete*" `
-                -and $_.Name -notlike "*not*" `
-                -and $_.Name -notlike "*e2e*"}
-            if ($Folders){
-                foreach ($Folder in $Folders){
-                    Remove-Item $Folder.FullName -Recurse -Confirm:$false
-                    $ListOfFoldersRemoved.Add($Folder.FullName)
-                    if (Test-Path $Folder.FullName -ErrorAction Ignore)
-                    {
-                        $RemovalFailed.Add($Folder.FullName)
-                    }
-                }
-            }
-
-            ## Remove Other Files ##
-            $Files = Get-ChildItem $DriveLetter\rs-pkgs -Force | Where-Object {
-                $_.psiscontainer -eq $false `
-                -and $_.Name -notmatch "\d-\d" `
-                -and $_.Name -notlike "*delete*" `
-                -and $_.Name -notlike "*not*" `
-                -and $_.Name -notlike "computer.xml" `
-                -and $_.Name -notlike "WHAM-script.ps1" `
-                -and $_.FullName -notlike $LogFile}
-            if ($Files){
-                foreach ($File in $Files){
-                    Remove-Item $File.FullName -Confirm:$false
-                    $ListOfFilesRemoved.Add($File.FullName)
-                    if (Test-Path $File.FullName -ErrorAction Ignore)
-                    {
-                        $RemovalFailed.Add($Folder.FullName)
-                    }
-                }
-            }
-
-            #Output and logging
-            $After = Get-FolderSize $DriveLetter\rs-pkgs
-            $Output.'Items Removed' = $ListOfFilesRemoved + $ListOfFoldersRemoved
-            $Output.'Removal Failed' = $RemovalFailed
-            $Output.'Space Recovered (GB)' = $Before - $After
-            
-            Log-Changes "Emptied the following files from RS-PKGS" -Date -LogFile $Logfile
-            Log-Changes $($output.'Items Removed') -LogFile $Logfile
-            return $Output
-        }
-        catch{
-            $Output.ErrorMsg = "Error Emptying rs-pkgs folder"
-            $Output.ErrorMsg  += "Error message: $($_.Exception.Message)"
-            return $Output
-        }
-    }
-
     Function Enable-NTFSCompression{
         param(
             $FoldersThatCanBeCompressed
@@ -1347,7 +1261,6 @@ try{
         return $Output
         }
         catch{
-            $Output.ErrorMsg = "Error Emptying rs-pkgs folder"
             $Output.ErrorMsg  += "Error message: $($_.Exception.Message)"
             return $Output
         }
@@ -1373,37 +1286,6 @@ try{
 
     #endregion 
     ##################### Output psobject - END #####################
-
-    #################### Exclusions - BEGIN ####################
-    #region 
-
-    #These criteria will exclude the devices from the checks.
-
-    <#
-    #Kept for reference incase there's a reason to filter by accounts.
-    Try
-    {
-        $AccountNumber = (Get-ItemProperty -Path HKLM:\SOFTWARE\Rackspace -Name CustomerNumber -ErrorAction Stop).CustomerNumber
-    }
-    catch
-    {
-        $Output.Recommendations = "ERROR: Could not read account registry key"
-        Return $Output
-        break
-    }
-
-    $ExcludedAccounts = $CustomAccounts = @(1517063,34031,940995,29502,24645,897893,27261,1747134,3316329,918433,571737,1036468,911164,1495823,1927162,997808,1700246,1861184,914932,1663086,917731,954728,1036410,239737)
-    if($ExcludedAccounts -contains $AccountNumber)
-    {
-        $Output.Recommendations = "ERROR: Template is disabled on custom accounts while an issue is fixed"
-        Return $Output
-        break
-    }
-    #>
-
-    #endregion 
-    #################### Exclusions - END #####################
-
     $Global:Recommendations = @()
 
     #################### Validate disk path - BEGIN ####################
@@ -1481,7 +1363,7 @@ try{
                 $Profiles = @()
                 foreach ($folder in $profilefolders)
                 {
-                    #regex the name for a potential racker fit
+                    
                     #IF (($folder.name -match "^[a-z]{2,4}\d{4,5}$") -or ($folder.name -match "^[a-z]{3,}.[a-z]{3,}$") -or ($folder.name -match "[a-z]{3,}.cust$"))
                     #originally i was going to regex it, then i realise it make more sense to show profiles bigger then 0.25GB, as a customer might have a massive one
                     $ProfileSize = $null
@@ -1494,7 +1376,7 @@ try{
                         }
                         $Profiles += $ProfileTemp
                         $TotalProfileSize =  $TotalProfileSize + $ProfileSize 
-                        Add-Recommendations -Category "Action" -Recommendation  "Profile $($folder.name) is over $limit`GB, delete if racker or contact customer" -SpaceUsed $ProfileSize 
+                        Add-Recommendations -Category "Action" -Recommendation  "Profile $($folder.name) is over $limit`GB" -SpaceUsed $ProfileSize 
                     }
                 }
 
@@ -1552,7 +1434,6 @@ try{
     #    "$DriveLetter\Windows\Installer"
         "$DriveLetter\Windows\inf"
     #    "$DriveLetter\Windows\ServiceProfiles\NetworkService\AppData\Local\Temp"
-        "$DriveLetter\rs-pkgs"
     #    "$DriveLetter\RECYCLER"
         "$DriveLetter\`$Recycle.Bin"
     #    "$DriveLetter\Windows\Microsoft.NET\Framework64\v1.1.4322\Temporary ASP.NET Files"
@@ -1566,7 +1447,6 @@ try{
         "$DriveLetter\Windows\Installer"
         "$DriveLetter\Windows\inf"
     #    "$DriveLetter\Windows\ServiceProfiles\NetworkService\AppData\Local\Temp"
-        "$DriveLetter\rs-pkgs"
     )
 
     $Folders = @()
@@ -1585,19 +1465,16 @@ try{
                     switch -wildcard ($folder)
                     {
                         "*Temporary ASP.NET Files*" {
-                            Add-Recommendations -Category "Customer" -Recommendation "Temporary ASP.NET Files is larger then 500MB, consider deleting this folder (check wiki: rax.io/lowdisk) $Folder" -SpaceUsed $foldersize
+                            Add-Recommendations -Category "Customer" -Recommendation "Temporary ASP.NET Files is larger then 500MB, consider deleting this folder  $Folder" -SpaceUsed $foldersize
                         }
                         "*winsxs" {
                             #check 5gB
                             if($foldersize -gt 5){
-                                Add-Recommendations -Category "Caution" -Recommendation "$Folder is larger then 5GB, consider running DISM command (check wiki: rax.io/lowdisk)"  -SpaceUsed $foldersize
+                                Add-Recommendations -Category "Caution" -Recommendation "$Folder is larger then 5GB, consider running DISM command "  -SpaceUsed $foldersize
                             }
                         }
-                        "*rs-pkgs" {
-                            Add-Recommendations -Category "Action" -Recommendation "$Folder is larger then 500MB, consider deleting contents"  -SpaceUsed $foldersize
-                        }
                         "*SoftwareDistribution" {
-                            Add-Recommendations -Category "Customer" -Recommendation "SoftwareDistribution is larger then 500MB, consider recreating the folder (check wiki: rax.io/lowdisk)"  -SpaceUsed $foldersize
+                            Add-Recommendations -Category "Customer" -Recommendation "SoftwareDistribution is larger then 500MB, consider recreating the folder "  -SpaceUsed $foldersize
                         }
                         "*`$Recycle.Bin" {
                             Add-Recommendations -Category "Action" -Recommendation "Recycle Bin ($Folder) is larger then 500MB, consider deleting contents"  -SpaceUsed $foldersize
@@ -1822,18 +1699,6 @@ try{
                 $output.Remediation += (ConvertTo-ASCII -NoAddBlankLine -data ($RecycleBinResults | Select-Object "ErrorMsg")| out-string)
             }
         }
-
-        #Did we recomend emptying RS-PKGS
-        if($Global:Recommendations -like "*rs-pkgs*"){
-            $output.Remediation += "Empty RS-PKGS result"
-            $RSPKGsResults = Clear-RSPkgs $DriveLetter
-            if($null -eq $RSPKGsResult.ErrorMsg){
-                $output.Remediation += (ConvertTo-ASCII -NoAddBlankLine -data ($RSPKGsResults | Select-Object "Space Recovered (GB)")| out-string)
-            }
-            else{
-                $output.Remediation += (ConvertTo-ASCII -NoAddBlankLine -data ($RSPKGsResults | Select-Object "ErrorMsg")| out-string)
-            }
-        }
         #Did we Recomend turning on compression?
         if($Global:Recommendations -like "*Turn on Compression for*"){
             $output.Remediation += "Enabling of NTFS Compression Result"
@@ -1911,7 +1776,7 @@ try{
     $OutputReport = @()
     $OutputReport += "[TICKET_UPDATE=PRIVATE]"
     $OutputReport += "[TICKET_STATUS=ALERT RECEIVED]"  
-    $OutputReport += "The alert is still active and requires Racker intervention. Please review the low disk report below and troubleshoot accordingly:`n "  
+    $OutputReport += "The alert is still active and requires intervention. Please review the low disk report below and troubleshoot accordingly:`n "  
     $OutputReport += "Virtual Machine  : $($OSInfo.VM)"
     $OutputReport += "Operating System : $($OSInfo.OS)"
     $OutputReport += "IPv4 Address     : $($OSinfo.IP)`n"
@@ -1946,7 +1811,7 @@ try{
     $OutputReport = @()
     $OutputReport += "[TICKET_UPDATE=PUBLIC]"
     $OutputReport += "[TICKET_STATUS=CONFIRM SOLVED]"
-    $OutputReport += "Hello Team,`n`nOur Smart Ticket engine has detected that available free diskspace is above 1GB for the $($DriveLetter) drive. Below is a summary of any actions taken, including emptying the Recycle Bin, compressing logs and/or deleting files from C:\rs-pkgs:`n"
+    $OutputReport += "Hello Team,`n`nOur Smart Ticket engine has detected that available free diskspace is above 1GB for the $($DriveLetter) drive. Below is a summary of any actions taken, including emptying the Recycle Bin, compressing logs.`n"
 
     $OutputReport += "Virtual Machine  : $($OSInfo.VM)"
     $OutputReport += "Operating System : $($OSInfo.OS)"
@@ -1956,7 +1821,7 @@ try{
     $OutputReport += $($output."Disk" | out-string)
 
     $OutputReport += "$($(ConvertTo-ASCII -NoAddBlankLine -EscapeSlash -data $output.Remediation) | out-string)"
-    $OutputReport += "As the free disk space is now above the above 1% alert threshold for the C: drive, we will mark this ticket as 'Confirm Solved'. Although the alert has cleared, please review your disk usage and ensure you have sufficient space on VM: $($OSInfo.VM) for your solution to run smoothly. If you have any questions, or require further assistance, please contact Rackspace Support to discuss further.`n`nKind regards,`n`nMicrosoft Azure Engineer`nRackspace Toll Free: (800) 961-4454"
+    $OutputReport += "As the free disk space is now above the above 1% alert threshold for the C: drive, we will mark this ticket as 'Confirm Solved'. Although the alert has cleared, please review your disk usage and ensure you have sufficient space on VM: $($OSInfo.VM) for your solution to run smoothly. If you have any questions, or require further assistance, please contact support"
     }
     else
     {
