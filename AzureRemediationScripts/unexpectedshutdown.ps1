@@ -20,7 +20,7 @@
 
     General:
     ---------------------------------------------------------------
-    Virtual Machine  : oh-jump
+    Virtual Machine  : VM1
     Operating System : Microsoft Windows Server 2012 R2 Datacenter
     IPv4 IP Address  : 172.16.195.20
     Last Reboot Time : 11/20/2017 10:00:06
@@ -37,9 +37,7 @@
     Installed Hot Fixes (Last 10):
     - Server was not patched between now and 11/20/2017 09:35:37
     
-    [TICKET_UPDATE=PRIVATE]
-    [TICKET_STATUS=ALERT RECEIVED] 
-
+   
 
     .NOTES
     Last Updated: 13-OCT-2017
@@ -49,16 +47,6 @@
     Version Table:
     Version :: Author         :: Live Date   :: JIRA     :: QC             :: Description
     -----------------------------------------------------------------------------------------------------------
-    1.0     :: Mark Wichall   :: 18-JAN-2016 :: IAWW-000 :: Martin Howlett :: Release
-    1.1     :: Mark Wichall   :: 18-JAN-2016 :: IAWW-000 :: Martin Howlett :: Added ASCII support
-    1.2     :: Martin Howlett :: 01-AUG-2016 :: IAWW-000 :: Mark Wichall   :: Fixes \r error in output
-    1.3     :: Dimitar Filipov:: 20-Mar-2017 :: IAWW-691 :: Mark Wichall   :: Added the Get-WSUSAutoRebootWithLoggedInUsers function to check for the "NoAutoRebootWithLoggedInUsers" registry key
-    1.4     :: Oliver Hurn    :: 13-OCT-2017 :: IAWW-000 :: Bob Larkin     :: Adjusted Output for Azure Smart Tickets
-    1.5     :: Oliver Hurn    :: 24-NOV-2017 :: IAWW-000 :: -------        :: Adjusted Output for Azure Smart Tickets
-    1.6     :: Oliver Hurn    :: 24-NOV-2017 :: IAWW-000 :: -------        :: Added Smart Ticket v2 logic for auto-closure capabilities
-    1.7     :: Oliver Hurn    :: 16-JUL-2018 :: IAWW-000 :: Bob Larkin     :: Auto closure for Hypervisor redeployments
-    1.8     :: Oliver Hurn    :: 30-JUL-2018 :: IAWW-000 :: Bob Larkin     :: Auto closure for Windows Updates installation
-
 #>
     #Script Uri
     Param(
@@ -78,7 +66,7 @@
     #endregion
 
     #Ticket Signature
-    $ticketSignature = "Kind regards,`n`nSmart Ticket Automation`nRackspace Toll Free (US): 1800 961 4454`n                    (UK): 0800 032 1667"
+    $ticketSignature = "Kind regards,`n`n"
 
 
 Function Resolve-AllServicesAlert {
@@ -837,22 +825,16 @@ Try{
     {
         $OutputReport += "Guest OS checks complete. Smart Ticket automation will retrieve the VM's power state and recent health events to confirm that the VM was recently redeployed to a new Hypervisor, another update will follow shortly.`n`n"
         $OutputReport += "$($ticketSignature)"    
-        $OutputReport += "[TICKET_UPDATE=PUBLIC]"
-        $OutputReport += "[TICKET_STATUS=ALERT RECEIVED]"
-        $OutputReport += "[TICKET_PAAS_REMEDIATION=TRUE]"
-        $OutputReport += "[TICKET_PAAS_DEVICE=$($ResourceId)]"
+
     }
     elseif ($($Global:RestartReason.Reason) -eq "Windows Updates have recently been installed.")
     {
         $OutputReport += "Guest OS checks complete. Smart Ticket automation has confirmed that this VM was rebooted after Windows Updates were recently installed. If you have any questions, please let us know, otherwise this ticket will close automatically.`n`n"
         $OutputReport += "$($ticketSignature)"    
-        $OutputReport += "[TICKET_UPDATE=PUBLIC]"
-        $OutputReport += "[TICKET_STATUS=CONFIRM SOLVED]"
+
     }
     else
     {
-        $OutputReport += "[TICKET_UPDATE=PUBLIC]"
-        $OutputReport += "[TICKET_STATUS=ALERT RECEIVED]"
     }
     #escape any backslash so BBcode does not parse it as new lines etc
     #the double \ in the first entry is because its regex so we need to escape the slash as a literal character

@@ -3,7 +3,7 @@
     Azure script  - set the environment variable for ARM_ACCESS_KEY.
        
     .DESCRIPTION
-    User picks which enviroenment they are working on and the script will change the subscription and get teh primary account key for the relevant storage account and set environment variable for ARM_ACCESS_KEY.
+    User picks which environment they are working on and the script will change the subscription and get the primary account key for the relevant storage account and set environment variable for ARM_ACCESS_KEY.
     Prerequisites: Terraform storage account must exist
     Makes changes: Yes
     Changes Made:
@@ -19,6 +19,10 @@
     1.0     :: Bob Larkin         :: 28-Feb-2019 :: 
 #>
 
+#Check if user is logged in
+if ([string]::IsNullOrEmpty($(Get-AzureRmContext).Account)) {Login-AzureRmAccount}
+
+
 $CurrentArmKey = Get-childitem ENV: | where {$_.name -eq "ARM_ACCESS_KEY"}
 Write-host "Current Access key is set to:" -ForegroundColor Green
 $CurrentArmKey
@@ -29,6 +33,8 @@ while("y","n" -notcontains $UserInput)
     }
 
 If ($UserInput -eq "y")
+
+
     {
         $env = @("prod","nonprod","test","uat","ps","stg","dev")
         $EnvInput = $env | Out-GridView -OutputMode Single

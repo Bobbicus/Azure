@@ -212,21 +212,7 @@
     "networkSecurityGroupDMZNameB": "[concat(variables('subnetDMZNameB'), '-NSG')]",
     "networkSecurityGroupAPPNameB": "[concat(variables('subnetAPPNameB'), '-NSG')]",
     "networkSecurityGroupINSNameB": "[concat(variables('subnetINSNameB'), '-NSG')]",
-    "networkSecurityGroupADNameB": "[concat(variables('subnetADNameB'),  '-NSG')]",
-    "rackspaceBastionDFW": "172.99.99.10/32",
-    "rackspaceBastionIAD": "146.20.2.10/32",
-    "rackspaceBastionORD": "161.47.0.10/32",
-    "rackspaceBastionHKG": "119.9.122.10/32",
-    "rackspaceBastionLON": "134.213.179.10/32",
-    "rackspaceBastionLON5": "134.213.178.10/32",
-    "rackspaceBastionSYD": "119.9.148.10/32",
-    "rackspacepBastionDFW": "72.3.186.100/32",
-    "rackspacepBastionIAD": "146.20.30.100/32",
-    "rackspacepBastionORD": "161.47.6.100/32",
-    "rackspacepBastionHKG": "120.136.39.100/32",
-    "rackspacepBastionLON": "134.213.183.100/32",
-    "rackspacepBastionLON5": "134.213.182.100/32",
-    "rackspacepBastionSYD": "119.9.163.100/32"
+    "networkSecurityGroupADNameB": "[concat(variables('subnetADNameB'),  '-NSG')]"
   },
   "resources": [{
       "apiVersion": "2015-05-01-preview",
