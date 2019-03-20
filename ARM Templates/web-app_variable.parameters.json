@@ -1,0 +1,81 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "project_name": {
+      "value": "dog"
+    },
+    "short_region": {
+      "value": "uks"
+    },
+    "environment": {
+      "value": "dev"
+    },
+    "sku": {
+      "value": "S2"
+    },
+    "skuCapacity": {
+      "value": 2
+    },
+    "location": {
+      "value": "UK South"
+    },
+    "netFrameworkVersion": {
+      "value": "v4.7"
+    },
+    "phpVersion": {
+      "value": "Off"
+    },
+    "pythonVersion": {
+      "value": "Off"
+    },
+    "32Bit": {
+      "value": "false"
+    },
+    "webSockets": {
+      "value": "false"
+    },
+    "alwaysOn": {
+      "value": "false"
+    },
+    "webServerLogging": {
+      "value": "true"
+    },
+    "detailedErrors": {
+      "value": "true"
+    },
+    "failedRequestTrace": {
+      "value": "true"
+    },
+    "clientAffinityEnabled": {
+      "value": "false"
+    },
+    "logSize": {
+      "value": 25
+    },
+    "buildDate": {
+      "value": "20/03/19"
+    },
+    "buildBy": {
+      "value": "Bob Larkin"
+    },
+    "defaultDocuments": {
+      "value": [
+        "Default.htm",
+        "Default.html",
+        "Default.asp",
+        "index.htm",
+        "index.html",
+        "iisstart.htm",
+        "default.aspx",
+        "index.php",
+        "hostingstart.html"
+      ]
+    }
+
+    //
+    // Application Insights can be added by
+    // uncommenting lines 230-243 in the template.
+    //
+  }
+}

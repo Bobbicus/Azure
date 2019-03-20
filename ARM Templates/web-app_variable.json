@@ -1,0 +1,251 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sku": {
+      "type": "string",
+      "defaultValue": "S1",
+      "metadata": {
+        "description": "The SKU of App Service Plan "
+      }
+    },
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "Describes plan's instance count"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "UK South",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "netFrameworkVersion": {
+      "type": "string",
+      "defaultValue": "v4.6",
+      "allowedValues": [
+        "v3.5",
+        "v4.7"
+      ]
+    },
+    "phpVersion": {
+      "type": "string",
+      "defaultValue": "Off",
+      "allowedValues": [
+        "Off",
+        "5.5",
+        "5.6",
+        "7.0",
+        "7.1"
+      ]
+    },
+    "pythonVersion": {
+      "type": "string",
+      "defaultValue": "Off",
+      "allowedValues": [
+        "Off",
+        "2.7",
+        "3.4"
+      ]
+    },
+    "32Bit": {
+      "type": "string",
+      "defaultValue": "false",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "webSockets": {
+      "type": "string",
+      "defaultValue": "false",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "alwaysOn": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "webServerLogging": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "detailedErrors": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "failedRequestTrace": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "clientAffinityEnabled": {
+      "type": "string",
+      "defaultValue": "false"
+    },
+    "defaultDocuments": {
+      "type": "array",
+      "defaultValue": [
+        "Default.htm",
+        "Default.html",
+        "Default.asp",
+        "index.htm",
+        "index.html",
+        "iisstart.htm",
+        "default.aspx",
+        "index.php",
+        "hostingstart.html"
+      ]
+    },
+    "logSize": {
+      "type": "int",
+      "defaultValue": 25,
+      "minValue": 25,
+      "maxValue": 100
+    },
+    "environment": {
+      "type": "string",
+      "allowedValues": [
+        "prod",
+        "stg",
+        "tst",
+        "dev",
+        "dr"
+      ],
+      "metadata": {
+        "description": "The Environment type we are building",
+        "group": "Tags",
+        "order": 1,
+        "question": "Please enter environment type : "
+      },
+      "defaultValue": "Production"
+    },
+    "short_region": {
+      "type": "string",
+      "allowedValues": [
+        "uks",
+        "ukw"
+      ],
+      "metadata": {
+        "description": "The short region i.e. uks for UK South",
+        "question": "Please enter short region : "
+      },
+      "defaultValue": "uks"
+    },
+    "project_name": {
+      "type": "string",
+      "defaultValue": "demo",
+      "metadata": {
+        "description": "The short name of the application or project",
+        "question": "Please enter application short name : "
+      }
+    },
+    "buildDate": {
+      "type": "string",
+      "metadata": {
+        "description": "The date of this build",
+        "group": "Tags",
+        "order": 2,
+        "question": "Please enter todays date (mm/dd/yyyy) : "
+      },
+      "defaultValue": "mm/dd/yyyy"
+    },
+    "buildBy": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the person who build this environment",
+        "group": "Tags",
+        "order": 3,
+        "question": "Please enter your full name : "
+      },
+      "defaultValue": "First Last"
+    }
+  },
+
+  "variables": {
+    "appServicePlanName": "[concat(parameters('environment'),'-',parameters('project_name'),'-asp1')]",
+    "webAppName": "[concat(parameters('environment'),'-',parameters('project_name'),'-web1')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "type": "Microsoft.Web/serverfarms",
+      "kind": "app",
+      "name": "[variables('appServicePlanName')]",
+      "location": "[parameters('location')]",
+      "comments": "This app service plan is used for the web app and slots.",
+      "dependsOn": [],
+      "sku": {
+        "name": "[parameters('sku')]",
+        "capacity": "[parameters('skuCapacity')]"
+      },
+      "tags": {
+        "displayName": "[variables('appServicePlanName')]",
+        "Environment": "[parameters('environment')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      },
+      "properties": {
+        "name": "[variables('appServicePlanName')]"
+      }
+    },
+    {
+      "apiVersion": "2016-08-01",
+      "type": "Microsoft.Web/sites",
+      "kind": "app",
+      "name": "[variables('webAppName')]",
+      "location": "[parameters('location')]",
+      "comments": "This is the web app, also the default 'nameless' slot.",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('AppServicePlanName')))]": "Resource",
+        "displayName": "[variables('webAppName')]",
+        "Environment": "[parameters('environment')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      },
+      "properties": {
+        "name": "[variables('webAppName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('AppServicePlanName'))]",
+        "siteConfig": {
+          "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
+          "PhpVersion": "[parameters('phpVersion')]",
+          "pythonVersion": "[parameters('pythonVersion')]",
+          "use32BitWorkerProcess": "[parameters('32Bit')]",
+          "webSocketsEnabled": "[parameters('webSockets')]",
+          "alwaysOn": "[parameters('alwaysOn')]",
+          "requestTracingEnabled": "[parameters('failedRequestTrace')]",
+          "httpLoggingEnabled": "[parameters('webServerLogging')]",
+          "logsDirectorySizeLimit": "[parameters('logSize')]",
+          "detailedErrorLoggingEnabled": "[parameters('detailedErrors')]",
+          "defaultDocuments": "[parameters('defaultDocuments')]"
+        },
+        "clientAffinityEnabled": "[parameters('clientAffinityEnabled')]"
+      }
+    }
+  ]
+}
