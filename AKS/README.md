@@ -1,16 +1,16 @@
-#AKS deployment using Windows nodes and images stored in ACR
+# AKS deployment using Windows nodes and images stored in ACR
 
 These demo scripts build a Azure Kubernetes Service (AKS) cluster and a Windows node pool. It then creates a deployment on the cluster using a Windows image stored in a private container registry hosted on Azure container registry (ACR).
 
 -The file AKS-deployment-demo.ps1 contains all the commands you need to build the cluster and the service.
 -The file deploy.yaml contains the configuration to start your container in the cluster.
 
-###Pre-requisites
+### Pre-requisites
 -Windows nodes on AKS is currently in preview, so you will need to register for the preview and make sure you have the relevent CLIs installed see details on this page https://docs.microsoft.com/en-us/azure/aks/windows-container-cli
 -You will need to have created the Windows image and stored this in ACR.  You will need to update the yaml file as explained below.
 -For more information on working with the Kubernetes dashboard https://docs.microsoft.com/en-us/azure/aks/kubernetes-dashboard
 
-###Deployment file
+### Deployment file
 
 The file is in yaml format.  This particular deployment is using a private image stored in Azure container registry.  To access it you need to have created the SPN in Azure to access the image.  The code to do this is in the script file . . . .. . . 
 
