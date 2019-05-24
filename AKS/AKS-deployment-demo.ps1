@@ -7,7 +7,8 @@
 $PASSWORD_WIN ="P@ssw0rd1234"
 $RGName = "aks-rg01"
 $AKSclusterName = "aks-cluster1"
-
+$SubscriptionID = "0000000000000-0000000-0000-00000000000"
+$ACRname = "registry1"
 az group create --name $RGName --location northeurope
 
 
@@ -75,10 +76,10 @@ az aks browse --resource-group $RGName --name $AKSclusterName
 ####################################################
 # Create secret to access a private Azure registry #
 ####################################################
-
+$Scope = "/subscriptions/$SubscriptionID/resourcegroups/docker/providers/Microsoft.ContainerRegistry/registries/$ACRName"
 #Create an SPN with access to the Azure container registry
 az ad sp create-for-rbac `
-  --scopes "/subscriptions/<your-subscription-id>/resourcegroups/docker/providers/Microsoft.ContainerRegistry/registries/<your-registry-name>" `
+  --scopes $Scope `
   --role Contributor `
   --name aks-access-spn 
 
