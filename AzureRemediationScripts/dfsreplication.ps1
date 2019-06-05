@@ -10,7 +10,6 @@
     Makes changes: No
     Changes Made:
 
-
     .EXAMPLE
     Full command: Get-DFSRState
     Description: Compare last error events with last known good events to see if issue has been resolved

@@ -3,19 +3,19 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "sqlServerPrimaryName": {
-      "value": "bobsql280833"
+      "value": "sqlserver1"
     },
     "sqlServerPrimaryAdminUsername": {
-      "value": "bobadmin"
+      "value": "store-in-pipeline"
     },
     "sqlServerPrimaryAdminPassword": {
-      "value": "TTNXYmC5A7dwh$"
+      "value": "store-in-pipeline"
     },
     "sqlServerPrimaryRegion": {
       "value": "eastus"
     },
     "sqlServerSecondaryName": {
-      "value": "bobsql2808dr33"
+      "value": "sqlserver2"
     },
     "sqlServerSecondaryRegion": {
       "value": "westeurope"
@@ -24,10 +24,10 @@
       "value": "bobadmin"
     },
     "sqlServerSecondaryAdminPassword": {
-      "value": "TTNXYmC5A7dwh$"
+      "value": "store-in-pipeline"
     },
     "sqlFailoverGroupName": {
-      "value": "bobfailplan"
+      "value": "store-in-pipeline"
     },
     "sqlFirewallStartRange": {
       "value": "172.99.99.10"
@@ -39,7 +39,7 @@
       "value": "Basic"
     },
     "databaseName": {
-      "value": "bobdb01"
+      "value": "sqldb01"
     },
     "databaseCollation": {
       "value": "SQL_Latin1_General_CP1_CI_AS"
@@ -54,10 +54,10 @@
       "value": "Production"
     },
     "buildDate": {
-      "value": "28/08/18"
+      "value": "28/08/22"
     },
     "buildBy": {
-      "value": "Bob Larkin"
+      "value": "your-name"
     }
   }
 }

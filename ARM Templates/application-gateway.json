@@ -110,10 +110,6 @@
       },
       "defaultValue": "Production"
     },
-
-
-
-
     "buildDate": {
       "type": "string",
 
@@ -128,7 +124,7 @@
       "metadata": {
         "description": "The e-mail address of the person who build this environment"
       },
-      "defaultValue": "Rackspace"
+      "defaultValue": "user-name"
     }
 
   },

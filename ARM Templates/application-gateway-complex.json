@@ -137,7 +137,7 @@
       "metadata": {
         "description": "The e-mail address of the person who build this environment"
       },
-      "defaultValue": "Racker"
+      "defaultValue": "user-name"
     }
   },
   "variables": {

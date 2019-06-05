@@ -63,6 +63,9 @@
 
 
 #>  
+    
+    
+    <#
     #Script Uri
     Param(
     [Parameter(Mandatory=$false)]$PayloadUri
@@ -82,18 +85,31 @@
         #Testing payload
         $object = ConvertFrom-Json "$(get-content -Path C:\temp\shutdown1.json)"
     }
-
+    
     #Set Payload variables
     $vmName = $object.ResourceId | Split-Path -Leaf
     $Subscription = $object.SubscriptionId
     $ResourceGroup = $object.ResourceGroup
     $ResourceId = $object.ResourceId
     #endregion
+    #>
 
 
-    #Ticket Signature
-    $ticketSignature = "Kind regards,`n`n"
+#Get subscription from user input
+$Subscription = Get-AzSubscription | Out-GridView -OutputMode Single
+#Set active subscription
+Set-AzContext -Subscription $Subscription.Id
 
+#Get VM from user input
+$vm = Get-AzVM | Out-GridView -OutputMode Single
+$vmName = $VM.Name
+
+#Get resource group and ID from VM details
+$ResourceGroup = $VM.ResourceGroupName
+$ResourceId = $VM.Id
+
+#Ticket Signature
+$ticketSignature = "Kind regards,`n`n"
 #Main Function
 Function Get-UnexpectedShutdown
 {
@@ -105,7 +121,7 @@ Function Get-UnexpectedShutdown
         try
         {
             #Create VM variable
-            $vm = Get-AzureRmVM -Name $vmName -ResourceGroupName $ResourceGroup -Status
+            $vm = Get-AzVM -Name $vmName -ResourceGroupName $ResourceGroup -Status
 
             #Get the PowerState of the VM
             ($vm.Statuses | Where-Object {$_.Code -like "*PowerState*"}).DisplayStatus
@@ -120,76 +136,78 @@ Function Get-UnexpectedShutdown
         #Set $powerState variable
         $powerState = Get-VmState
 
-#Get Resource Health via REST API
-function Get-AzureResourceHealth 
-{
+    #Get Resource Health via REST API
+    function Get-AzureResourceHealth 
+    {
     
-    # Set Azure AD Tenant for selected Azure Subscription
-    $adTenant = (Get-AzureRmContext).Tenant.id
-    
-
-    # Set parameter values for Azure AD auth to REST API
-    $clientId = "1950a258-227b-4e31-a9cf-717495945fc2" # Well-known client ID for Azure PowerShell
-    $resourceAppIdURI = "https://management.core.windows.net/" # Resource URI for REST API
-    $authority = "https://login.microsoftonline.com/$adTenant/" # Azure AD Tenant Authority
-    
-    # Create Authentication Context tied to Azure AD Tenant
-    $authtoken = ((Get-AzureRmContext).TokenCache.ReadItems() | ? {$_.Authority -eq $authority}).AccessToken
+        # Set Azure AD Tenant for selected Azure Subscription
+        $adTenant = (Get-AzContext).Tenant.id
     
 
-    # Set REST API parameters
-    $apiVersion = "2015-01-01"
-    $contentType = "application/json;charset=utf-8"
+        # Set parameter values for Azure AD auth to REST API
+        $clientId = "1950a258-227b-4e31-a9cf-717495945fc2" # Well-known client ID for Azure PowerShell
+        $resourceAppIdURI = "https://management.core.windows.net/" # Resource URI for REST API
+        $authority = "https://login.microsoftonline.com/$adTenant/" # Azure AD Tenant Authority
     
-    # Set HTTP request headers to include Authorization header
-    $requestHeader = @{
-       'Content-Type'='application\json'
-       'Authorization'= "Bearer " + $authtoken
-    }
+        # Create Authentication Context tied to Azure AD Tenant, I had to add [0] as I was getting multiple tokens.
+        #########
+        #  TEST
+        #########
+        $authtoken = ((Get-AzContext).TokenCache.ReadItems() | Where-Object {$_.Authority -eq $authority}).AccessToken[0]
 
-    # Set initial URI for calling Resource Health REST API
-    $VMuriRequest = "https://management.azure.com/subscriptions/$subscription/resourceGroups" + `
-        "/$($ResourceGroup)/providers/Microsoft.Compute/virtualMachines/$($vmName)/providers" + `
-        "/Microsoft.ResourceHealth/availabilityStatuses?api-version=$apiVersion"
+        # Set REST API parameters
+        $apiVersion = "2015-01-01"
+        $contentType = "application/json;charset=utf-8"
     
-    # Call Resource Health REST API
-    $healthData = Invoke-RestMethod -Uri $VMuriRequest -Method Get -Headers $requestHeader -ContentType $contentType
+        # Set HTTP request headers to include Authorization header
+        $requestHeader = @{
+            'Content-Type'='application\json'
+            'Authorization'= "Bearer " + $authtoken
+        }
+
+        # Set initial URI for calling Resource Health REST API
+        $VMuriRequest = "https://management.azure.com/subscriptions/$subscription/resourceGroups" + `
+            "/$($ResourceGroup)/providers/Microsoft.Compute/virtualMachines/$($vmName)/providers" + `
+            "/Microsoft.ResourceHealth/availabilityStatuses?api-version=$apiVersion"
     
-    #confirm unplanned redeployment
-    $script:confirmData = $healthdata.value.properties | Select-Object -First 2
+        # Call Resource Health REST API
+        $healthData = Invoke-RestMethod -Uri $VMuriRequest -Method Get -Headers $requestHeader -ContentType $contentType
+    
+        #confirm unplanned redeployment
+        $script:confirmData = $healthdata.value.properties | Select-Object -First 2
 
-    # Display Health Data for Azure resources in selected subscription
-    $formattedhealthdata = $healthData.value | Select-Object `
-            @{n='subscriptionId';e={$_.id.Split("/")[2]}},
-           location,
-            @{n='resourceGroup';e={$_.id.Split("/")[4]}},
-            @{n='resource';e={$_.id.Split("/")[8]}},
-            @{n='status';e={$_.properties.availabilityState}}, # ie., Available or Unavailable
-            @{n='summary';e={$_.properties.summary}},
-            @{n='reason';e={$_.properties.reasonType}},
-            @{n='occuredTime';e={$_.properties.occuredTime}} -First 2 |
-            Format-List
+        # Display Health Data for Azure resources in selected subscription
+        $formattedhealthdata = $healthData.value | Select-Object `
+                @{n='subscriptionId';e={$_.id.Split("/")[2]}},
+                location,
+                @{n='resourceGroup';e={$_.id.Split("/")[4]}},
+                @{n='resource';e={$_.id.Split("/")[8]}},
+                @{n='status';e={$_.properties.availabilityState}}, # ie., Available or Unavailable
+                @{n='summary';e={$_.properties.summary}},
+                @{n='reason';e={$_.properties.reasonType}},
+                @{n='occuredTime';e={$_.properties.occuredTime}} -First 2 |
+                Format-List
 
-    return $formattedhealthdata
-    }
-        #Add Output to variable and convert to String
-        $healthOutput = Get-AzureResourceHealth | Out-String
+        return $formattedhealthdata
+        }
+            #Add Output to variable and convert to String
+            $healthOutput = Get-AzureResourceHealth | Out-String
 
-        #If VM State is healthy, then output and close ticket
-        if ($powerState -eq "VM running" -and $confirmData.reasonType[1] -eq "Unplanned" -and $confirmData.availabilityState[0] -eq "Available")
-        {
-            $Output1 = $null
-            $Output1 += "Hello Team,`n`nSmart Ticket Automation has confirmed VM: $($VMName) is available and running, after it had recently been redeployed to a new hypervisor:`n"
-            $Output1 += "`n`Virtual Machine Details:`n------------------------------------------------------------`n"
-            $Output1 += "VM Resource    : $($vmName)`n"
-            $Output1 += "Power State    : $($powerState)`n"
-            $Output1 += "Resource Group : $($ResourceGroup)`n`n"
-            $Output1 += "Recent Health Events:`n"
-            $Output1 += "------------------------------------------------------------"
-            $Output1 += "$healthOutput"
-            $Output1 += "This ticket will be set to Confirm Solved status, please let us know if you have any questions.`n`n"
-            $Output1 += "$($ticketSignature)"  
-            $Output1
+            #If VM State is healthy, then output and close ticket
+            if ($powerState -eq "VM running" -and $confirmData.reasonType[1] -eq "Unplanned" -and $confirmData.availabilityState[0] -eq "Available")
+            {
+                $Output1 = $null
+                $Output1 += "Hello Team,`n`nSmart Ticket Automation has confirmed VM: $($VMName) is available and running, after it had recently been redeployed to a new hypervisor:`n"
+                $Output1 += "`n`Virtual Machine Details:`n------------------------------------------------------------`n"
+                $Output1 += "VM Resource    : $($vmName)`n"
+                $Output1 += "Power State    : $($powerState)`n"
+                $Output1 += "Resource Group : $($ResourceGroup)`n`n"
+                $Output1 += "Recent Health Events:`n"
+                $Output1 += "------------------------------------------------------------"
+                $Output1 += "$healthOutput"
+                $Output1 += "This ticket will be set to Confirm Solved status, please let us know if you have any questions.`n`n"
+                $Output1 += "$($ticketSignature)"  
+                $Output1
         }
         #If VM state is not healthy, output and leave ticket open for further investigation
         else

@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "appGatewayName": {
-      "value": "EU2-APG-JBOSS-PRD"
+      "value": "EUS-APG-1-PRD"
     },
     "skuName": {
       "value": "Standard_Small"
@@ -12,10 +12,10 @@
       "value": 1
     },
     "vnetRG": {
-      "value": "RG-EASTUS2-GEHATOAL-NETWORK"
+      "value": "EUS-VNET-01-RG"
     },
     "vnetName": {
-      "value": "EASTUS2_VNET01"
+      "value": "EUS-VNET01"
     },    "subnetName": {
       "value": "AppGatewaySubnet"
     },
