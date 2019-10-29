@@ -6,12 +6,12 @@
     Checks VM Power State and retrieves recent Azure Health events to confirm Hypervisor guest live migration occurance.
 
     Supported: Yes
-    Keywords: azure,healthevent,reboot,smarttickets
+    Keywords: azure,healthevent,reboot
     Prerequisites: No
     Makes changes: Yes
 
     .EXAMPLE
-    Full command:  .\raxunexpectedshutdown.paas.ps1
+    Full command:  .\unexpectedshutdown.paas.ps1
     Description: Checks VM Power State and retrieves recent Azure Health events to confirm Hypervisor guest live migration occurance.
        
     .OUTPUTS
@@ -19,7 +19,7 @@
  
     Hello Team,
 
-    Smart Ticket Automation has confirmed VM: jumpy is available and running, after it had recently been redeployed to a new hypervisor:
+    The script has confirmed VM: jumpy is available and running, after it had recently been redeployed to a new hypervisor:
 
     Virtual Machine Details:
     ------------------------------------------------------------
@@ -56,10 +56,10 @@
     .NOTES
     Minimum OS: 2012 
     Minimum PoSh: 4.0
-
     Version Table:
     Version :: Author             :: Live Date   :: JIRA     :: QC          :: Description
     -----------------------------------------------------------------------------------------------------------
+    1.0     :: Bob Larkin         :: 06-Jun-2019 :: XX-XXX   ::             :: Release
 
 
 #>  
@@ -197,7 +197,7 @@ Function Get-UnexpectedShutdown
             if ($powerState -eq "VM running" -and $confirmData.reasonType[1] -eq "Unplanned" -and $confirmData.availabilityState[0] -eq "Available")
             {
                 $Output1 = $null
-                $Output1 += "Hello Team,`n`nSmart Ticket Automation has confirmed VM: $($VMName) is available and running, after it had recently been redeployed to a new hypervisor:`n"
+                $Output1 += "Hello Team,`n`nThis script  has confirmed VM: $($VMName) is available and running, after it had recently been redeployed to a new hypervisor:`n"
                 $Output1 += "`n`Virtual Machine Details:`n------------------------------------------------------------`n"
                 $Output1 += "VM Resource    : $($vmName)`n"
                 $Output1 += "Power State    : $($powerState)`n"
@@ -213,7 +213,7 @@ Function Get-UnexpectedShutdown
         else
         {
             $Output2 = $null
-            $Output2 += "Hello Team,`n`nSmart Ticket Automation has confirmed the PowerState of VM: $($VMName) to be - $($powerState):"
+            $Output2 += "Hello Team,`n`nThis script has confirmed the PowerState of VM: $($VMName) to be - $($powerState):"
             $Output2 += "`n`nVirtual Machine Details:`n------------------------------------------------------------`n"
             $Output2 += "VM Resource    : $($vmName)`n"
             $Output2 += "Power State    : $($powerState)`n"
