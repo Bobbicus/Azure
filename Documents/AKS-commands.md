@@ -19,6 +19,10 @@ kubectl get pods -n <namespace-name>
 kubectl describe pod <pod-name> -n <namespace-name>
 ```
 
+```
+#Get logs from pods
+kubectl log <pod-name> <container-name> -n <namespace-name>
+```
 
 ## Remote SSH into a pod
 
